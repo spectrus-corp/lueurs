@@ -4,10 +4,76 @@
 <meta charset='utf-8'>
 <meta name='viewport' content='width=device-width,initial-scale=1,viewport-fit=cover'>
 <title>Lueurs : jeu 3D</title>
+<style>
+:root{--g:#ffd36b;--r:#ff6b8a;--c:#6be3ff;--bg:#14102a}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden;background:var(--bg);color:#f3e9d2;font-family:Georgia,'Times New Roman',serif;touch-action:none;user-select:none}
+canvas{display:block}
+#hud{position:fixed;top:calc(12px + env(safe-area-inset-top,0px));left:18px;right:18px;display:flex;justify-content:space-between;align-items:flex-start;pointer-events:none;text-shadow:0 1px 8px #000a;font-size:20px}
+#s{font-size:34px;color:var(--g)}#cb{color:var(--c);margin-left:8px}
+#wl{font-size:14px;opacity:.85;color:var(--c)}
+#fx{font-size:15px;color:var(--c);text-align:center;line-height:1.5}
+#l{color:var(--r);font-size:24px}
+#bn{position:fixed;top:22%;left:0;right:0;text-align:center;font-size:clamp(28px,6vw,52px);color:var(--g);pointer-events:none;text-shadow:0 2px 16px #000;opacity:0}
+#dash{position:fixed;left:18px;bottom:calc(18px + env(safe-area-inset-bottom,0px));width:120px;height:8px;border-radius:4px;background:#ffffff22}
+#db{display:block;height:100%;background:var(--g);border-radius:4px;transform-origin:left}
+#dbtn{position:fixed;right:18px;bottom:calc(18px + env(safe-area-inset-bottom,0px));display:none;padding:18px 24px}
+@media(pointer:coarse){#dbtn{display:block}}
+#fl{position:fixed;inset:0;background:#ff2a55;opacity:0;pointer-events:none}
+#msg,#shop{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:#14102ae6;text-align:center;padding:20px;overflow:auto}
+#shop{background:#14102af5;justify-content:flex-start}
+#msg[hidden],#go[hidden],#shop[hidden]{display:none}
+h1{font-size:clamp(44px,10vw,88px);margin:0;font-weight:400;color:var(--g);letter-spacing:.03em}
+#shop h1{font-size:clamp(34px,7vw,56px)}
+#shop h2{margin:6px 0 0;font-size:18px;font-weight:400;color:var(--c)}
+#sinfo{display:flex;gap:22px;flex-wrap:wrap;justify-content:center;font-size:18px}
+#sw{color:var(--g)}#st{opacity:.8}
+#sg,#sc{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;max-width:720px}
+.cd{border:1px solid var(--rc);box-shadow:0 0 14px -6px var(--rc);border-radius:14px;padding:12px;width:150px;display:flex;flex-direction:column;gap:6px;align-items:center;background:#ffffff0a}
+.sw{width:54px;height:54px;border-radius:50%;display:block;box-shadow:inset 0 0 12px #0008}
+.cd b{font-size:15px}.cd .rr{font-size:12px;opacity:.75}.cd button{padding:6px 12px;font-size:14px;width:100%}
+.cd em{font-style:normal;font-size:13px;color:#7dffb0}
+#sc button{font-size:14px;padding:8px 14px}
+#sc button.on{background:var(--g);color:var(--bg)}
+.row{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+#board{background:#ffffff10;border:1px solid #ffffff22;border-radius:16px;padding:14px 18px;min-width:min(320px,90vw);text-align:left}
+#board h2{margin:0 0 8px;font-size:18px;color:var(--c);font-weight:400}
+ol{list-style:none;margin:0;padding:0}
+li{display:flex;justify-content:space-between;padding:3px 0;font-size:17px}
+li b{color:var(--g)}li.e{opacity:.7;justify-content:center;font-size:15px}
+#go{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+input{font:inherit;font-size:18px;padding:10px 14px;border-radius:999px;border:2px solid #ffffff44;background:#0006;color:inherit;width:170px;user-select:text}
+button{font:inherit;font-size:20px;padding:12px 30px;border:2px solid var(--g);background:transparent;color:var(--g);border-radius:999px;cursor:pointer}
+button:hover,button:focus-visible{background:var(--g);color:var(--bg);outline:none}
+button:disabled{opacity:.5;cursor:default;background:transparent;color:var(--g)}
+small{opacity:.75;max-width:48ch;line-height:1.5}
+small i{font-style:normal;font-weight:bold}
+</style>
 </head>
 <body>
-<p>Loading full game... please wait for next commit.</p>
+<div id='hud'><div><span id='s'>0</span><span id='cb'></span><div id='wl'></div></div><div id='fx'></div><div id='l'></div></div>
+<div id='bn'></div>
+<div id='dash'><i id='db'></i></div>
+<button id='dbtn'>Dash</button>
+<div id='fl'></div>
+<div id='msg'>
+<h1 id='t'>Lueurs</h1>
+<p id='p'>Attrapez les lueurs dorées en enchaînant les prises pour faire monter le combo, et survivez aux cristaux.</p>
+<div id='go' hidden><input id='nm' maxlength='12' placeholder='Votre pseudo' autocomplete='off'><button id='sb'>Envoyer mon score</button></div>
+<div id='board'><h2>Records mondiaux</h2><ol id='bl'><li class='e'>Chargement…</li></ol></div>
+<div class='row'><button id='b'>Jouer</button><button id='bs'>Boutique</button></div>
+<small>ZQSD ou flèches pour piloter, Espace pour foncer, P pour la pause. Sur mobile : glissez un doigt et touchez Dash.<br><i style='color:#ff6b8a'>Cristal rouge</i> : il rebondit, évitez-le. <i style='color:#ff9a3a'>Cristal orange</i> : il vous poursuit. <i style='color:#4dff8f'>PNJ vert</i> : touchez-le pour +1 vie et +10 points, mais il ne reste pas longtemps. <i style='color:#6be3ff'>Lueur cyan</i> : bouclier qui détruit les cristaux. <i style='color:#c58bff'>Lueur violette</i> : gèle les cristaux. <i style='color:#ff7ad9'>Lueur rose</i> : aimant.</small>
+</div>
+<div id='shop' hidden>
+<h1>Boutique</h1>
+<div id='sinfo'><span id='sw'></span><span id='st'></span></div>
+<div id='sg'></div>
+<h2>Ma collection</h2>
+<div id='sc'></div>
+<button id='sx'>Retour</button>
+</div>
 <script src='https://cdn.jsdelivr.net/npm/three@0.150.1/build/three.min.js'></script>
 <script src='music_pixabay.js'></script>
+<script src='game.js'></script>
 </body>
 </html>
