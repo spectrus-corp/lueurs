@@ -7,17 +7,50 @@ function closeShop(){$('shop').hidden=true;if(!run)$('msg').hidden=false;seq([70
 $('shop').onclick=e=>{const b=e.target.closest('button');if(!b||b.disabled)return;if(b.id=='sx')closeShop();else if(b.dataset.tab){shopTab=b.dataset.tab;renderShop()}else if(b.dataset.b)buy(b.dataset.b);else if(b.dataset.e){equip(b.dataset.e);beep(740,.08,'triangle');noise(.08,3000,.04)}};
 
 /* ---- Codes bonus ---- */
-const CODES={FREEBONUS:{orbs:100000,once:1}};
+const CODES={
+FREEBONUS:{orbs:100000,once:1,label:'+100\u202f000 lueurs'},
+LUEURS:{orbs:25000,once:1,label:'+25\u202f000 lueurs'},
+STARTER:{orbs:8000,once:1,label:'+8\u202f000 lueurs'},
+CADEAU:{orbs:3000,once:1,label:'+3\u202f000 lueurs'},
+ORBE:{orbs:1500,once:1,label:'+1\u202f500 lueurs'},
+COMBO:{orbs:5000,item:'t10',once:1,label:'+5\u202f000 + tra\u00een\u00e9e Arc-en-ciel'},
+NEON:{item:'t5',once:1,label:'Tra\u00een\u00e9e N\u00e9on'},
+FLAMME:{item:'t4',once:1,label:'Tra\u00een\u00e9e Flamme'},
+RUBIS:{item:'k5',once:1,label:'Skin Rubis'},
+OCEAN:{item:'k2',once:1,label:'Skin Oc\u00e9an'},
+HALO:{item:'a1',once:1,label:'Accessoire Halo'},
+COURONNE:{item:'a3',once:1,label:'Accessoire Couronne'},
+AIMANT:{item:'u1',once:1,label:'Am\u00e9lioration Aimant +'},
+DASH:{item:'u2',once:1,label:'Am\u00e9lioration Dash vif'},
+RECOLTE:{item:'u7',once:1,label:'Am\u00e9lioration R\u00e9colte'},
+PACK:{orbs:12000,item:'k4',once:1,label:'+12\u202f000 + skin Cristal'},
+VIP:{orbs:50000,item:'k9',once:1,label:'+50\u202f000 + skin Nova'},
+SPECTRE:{item:'k10',once:1,label:'Skin Spectre'},
+GALAXIE:{item:'t8',once:1,label:'Tra\u00een\u00e9e Galaxie'},
+AILES:{item:'a6',once:1,label:'Accessoire Ailerons'}
+};
 function usedCodes(){try{return JSON.parse(localStorage.getItem('lueursCodes')||'[]')}catch(e){return []}}
 function markCode(c){const u=usedCodes();if(!u.includes(c)){u.push(c);try{localStorage.setItem('lueursCodes',JSON.stringify(u))}catch(e){}}}
+function grantItem(id){
+  if(!id||owned.includes(id))return false;
+  const it=CAT.find(x=>x.id===id);if(!it||it.secret)return false;
+  owned.push(id);
+  if(it.t!=='u'){try{equip(id)}catch(e){eq[it.t]=id;if(it.t==='k')setSkin(id);else if(it.t==='t')curTrail=it;else if(it.t==='a')setAcc(id)}}
+  return true;
+}
 function redeem(){const raw=($('cdIn').value||'').trim().toUpperCase().replace(/\s+/g,'');$('cdIn').value=raw;const msg=$('cdMsg');
 if(!raw){msg.textContent='Entrez un code';msg.style.color='var(--r)';return}
 const def=CODES[raw];
 if(!def){msg.textContent='Code invalide';msg.style.color='var(--r)';beep(200,.1,'sawtooth');return}
-if(def.once&&usedCodes().includes(raw)){msg.textContent='Code déjà utilisé';msg.style.color='var(--r)';beep(220,.08,'triangle');return}
-if(def.orbs){wallet+=def.orbs;save();try{$('wl').textContent='◈ '+fmt(wallet);$('sw').textContent='◈ '+fmt(wallet)+' lueurs'}catch(e){}}
+if(def.once&&usedCodes().includes(raw)){msg.textContent='Code d\u00e9j\u00e0 utilis\u00e9';msg.style.color='var(--r)';beep(220,.08,'triangle';return}
+const parts=[];
+if(def.orbs){wallet+=def.orbs;parts.push('+'+fmt(def.orbs)+' lueurs')}
+if(def.item){if(grantItem(def.item)){const it=find(def.item);parts.push(it?it.n:'item')}else parts.push('item d\u00e9j\u00e0 poss\u00e9d\u00e9')}
+save();
+try{$('wl').textContent='◈ '+fmt(wallet);$('sw').textContent='◈ '+fmt(wallet)+' lueurs'}catch(e){}
+try{if(typeof renderShop==='function'&&!$('shop').hidden)renderShop()}catch(e){}
 if(def.once)markCode(raw);
-msg.textContent=def.orbs?('+'+fmt(def.orbs)+' lueurs !'):'Bonus activé !';
+msg.textContent=def.label||(parts.join(' · ')||'Bonus activ\u00e9 !');
 msg.style.color='var(--g)';seq([523,659,784,1047],.08,'triangle');noise(.1,4000,.05);
 $('cdIn').value=''}
 $('cdGo').onclick=redeem;
@@ -39,6 +72,6 @@ function killGreen(){if(grn)S.remove(grn);grn=null;greenT=(lives>=3?22:12)+Math.
 function burst(p,k,n=12){for(let i=0;i<n;i++){const m=new THREE.Mesh(pg,pm[k]);m.position.copy(p);const a=Math.random()*6.28,s=3+Math.random()*5;m.userData={vx:Math.cos(a)*s,vy:2+Math.random()*4,vz:Math.sin(a)*s,life:.6};S.add(m);bits.push(m)}}
 let score=0,got=0,lives=3,run=false,paused=false,inv=0,best=0,combo=1,lastT=-9,shield=0,freeze=0,magnet=0,dashCd=0,flash=0,bt=0,wave=1,greenT=14,worldBest=0,heart=0,tk=0;const vel=new THREE.Vector3();
 try{best=+localStorage.getItem('lueurs')||0}catch(e){}
-function gain(n){score+=n;wallet+=n}
+function gain(n){score+=n;wallet+=Math.ceil(n*1.8)}
 setSkin(eq.k);curTrail=find(eq.t);
 function banner(s){$('bn').textContent=s;bt=1.8}
