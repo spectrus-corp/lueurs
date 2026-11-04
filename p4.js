@@ -8,25 +8,25 @@ $('shop').onclick=e=>{const b=e.target.closest('button');if(!b||b.disabled)retur
 
 /* ---- Codes bonus ---- */
 const CODES={
-FREEBONUS:{orbs:100000,once:1,label:'+100\u202f000 lueurs'},
-LUEURS:{orbs:25000,once:1,label:'+25\u202f000 lueurs'},
-STARTER:{orbs:8000,once:1,label:'+8\u202f000 lueurs'},
-CADEAU:{orbs:3000,once:1,label:'+3\u202f000 lueurs'},
-ORBE:{orbs:1500,once:1,label:'+1\u202f500 lueurs'},
-COMBO:{orbs:5000,item:'t10',once:1,label:'+5\u202f000 + tra\u00een\u00e9e Arc-en-ciel'},
-NEON:{item:'t5',once:1,label:'Tra\u00een\u00e9e N\u00e9on'},
-FLAMME:{item:'t4',once:1,label:'Tra\u00een\u00e9e Flamme'},
+FREEBONUS:{orbs:100000,once:1,label:'+100 000 lueurs'},
+LUEURS:{orbs:25000,once:1,label:'+25 000 lueurs'},
+STARTER:{orbs:8000,once:1,label:'+8 000 lueurs'},
+CADEAU:{orbs:3000,once:1,label:'+3 000 lueurs'},
+ORBE:{orbs:1500,once:1,label:'+1 500 lueurs'},
+COMBO:{orbs:5000,item:'t10',once:1,label:'+5 000 + traineee Arc-en-ciel'},
+NEON:{item:'t5',once:1,label:'Trainees Neon'},
+FLAMME:{item:'t4',once:1,label:'Trainees Flamme'},
 RUBIS:{item:'k5',once:1,label:'Skin Rubis'},
-OCEAN:{item:'k2',once:1,label:'Skin Oc\u00e9an'},
+OCEAN:{item:'k2',once:1,label:'Skin Ocean'},
 HALO:{item:'a1',once:1,label:'Accessoire Halo'},
 COURONNE:{item:'a3',once:1,label:'Accessoire Couronne'},
-AIMANT:{item:'u1',once:1,label:'Am\u00e9lioration Aimant +'},
-DASH:{item:'u2',once:1,label:'Am\u00e9lioration Dash vif'},
-RECOLTE:{item:'u7',once:1,label:'Am\u00e9lioration R\u00e9colte'},
-PACK:{orbs:12000,item:'k4',once:1,label:'+12\u202f000 + skin Cristal'},
-VIP:{orbs:50000,item:'k9',once:1,label:'+50\u202f000 + skin Nova'},
+AIMANT:{item:'u1',once:1,label:'Amelioration Aimant +'},
+DASH:{item:'u2',once:1,label:'Amelioration Dash vif'},
+RECOLTE:{item:'u7',once:1,label:'Amelioration Recolte'},
+PACK:{orbs:12000,item:'k4',once:1,label:'+12 000 + skin Cristal'},
+VIP:{orbs:50000,item:'k9',once:1,label:'+50 000 + skin Nova'},
 SPECTRE:{item:'k10',once:1,label:'Skin Spectre'},
-GALAXIE:{item:'t8',once:1,label:'Tra\u00een\u00e9e Galaxie'},
+GALAXIE:{item:'t8',once:1,label:'Trainees Galaxie'},
 AILES:{item:'a6',once:1,label:'Accessoire Ailerons'}
 };
 function usedCodes(){try{return JSON.parse(localStorage.getItem('lueursCodes')||'[]')}catch(e){return []}}
@@ -42,15 +42,15 @@ function redeem(){const raw=($('cdIn').value||'').trim().toUpperCase().replace(/
 if(!raw){msg.textContent='Entrez un code';msg.style.color='var(--r)';return}
 const def=CODES[raw];
 if(!def){msg.textContent='Code invalide';msg.style.color='var(--r)';beep(200,.1,'sawtooth');return}
-if(def.once&&usedCodes().includes(raw)){msg.textContent='Code d\u00e9j\u00e0 utilis\u00e9';msg.style.color='var(--r)';beep(220,.08,'triangle';return}
+if(def.once&&usedCodes().includes(raw)){msg.textContent='Code deja utilise';msg.style.color='var(--r)';beep(220,.08,'triangle');return}
 const parts=[];
 if(def.orbs){wallet+=def.orbs;parts.push('+'+fmt(def.orbs)+' lueurs')}
-if(def.item){if(grantItem(def.item)){const it=find(def.item);parts.push(it?it.n:'item')}else parts.push('item d\u00e9j\u00e0 poss\u00e9d\u00e9')}
+if(def.item){if(grantItem(def.item)){const it=find(def.item);parts.push(it?it.n:'item')}else parts.push('item deja possede')}
 save();
 try{$('wl').textContent='◈ '+fmt(wallet);$('sw').textContent='◈ '+fmt(wallet)+' lueurs'}catch(e){}
 try{if(typeof renderShop==='function'&&!$('shop').hidden)renderShop()}catch(e){}
 if(def.once)markCode(raw);
-msg.textContent=def.label||(parts.join(' · ')||'Bonus activ\u00e9 !');
+msg.textContent=def.label||(parts.join(' · ')||'Bonus active !');
 msg.style.color='var(--g)';seq([523,659,784,1047],.08,'triangle');noise(.1,4000,.05);
 $('cdIn').value=''}
 $('cdGo').onclick=redeem;
