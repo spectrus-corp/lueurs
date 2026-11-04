@@ -20,23 +20,29 @@ canvas{display:block}
 #dbtn{position:fixed;right:18px;bottom:calc(18px + env(safe-area-inset-bottom,0px));display:none;padding:18px 24px}
 @media(pointer:coarse){#dbtn{display:block}}
 #fl{position:fixed;inset:0;background:#ff2a55;opacity:0;pointer-events:none}
-#msg,#shop{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:#14102ae6;text-align:center;padding:20px;overflow:auto}
-#shop{background:#14102acc;justify-content:flex-start;backdrop-filter:blur(8px)}
-#prev{min-height:28px;font-size:14px;color:var(--c);opacity:.95;max-width:90vw}
+#msg{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:#14102ae6;text-align:center;padding:20px;overflow:auto}
+#shop{position:fixed;inset:0;display:flex;flex-direction:row;align-items:stretch;justify-content:flex-start;background:transparent;padding:0;overflow:hidden;pointer-events:none}
+#shopPanel{pointer-events:auto;width:min(400px,94vw);max-width:100%;height:100%;overflow-y:auto;overflow-x:hidden;background:#14102af2;backdrop-filter:blur(10px);padding:14px 12px 24px;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;box-shadow:8px 0 28px #0008}
+#prev{min-height:32px;font-size:13px;color:var(--c);opacity:.95;max-width:100%;line-height:1.35;padding:4px 6px;border-radius:8px;background:#ffffff0a}
+#prev.on{color:var(--g);background:#ffd36b22}
 .cd button.pv{padding:6px 10px;font-size:13px;border-color:var(--c);color:var(--c);margin-top:2px}
 .cd .tag{font-size:11px;opacity:.75;line-height:1.3}
-#stabs{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:4px 0}
-#stabs button{font-size:13px;padding:6px 12px;opacity:.75}
+#stabs{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:2px 0;width:100%}
+#stabs button{font-size:12px;padding:6px 10px;opacity:.75}
 #stabs button.on{opacity:1;background:var(--g);color:var(--bg)}
 #msg[hidden],#go[hidden],#shop[hidden]{display:none}
+#sg,#sc{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;width:100%;max-width:100%}
+.cd{border:1px solid var(--rc);box-shadow:0 0 14px -6px var(--rc);border-radius:14px;padding:12px;width:140px;min-height:148px;flex-shrink:0;display:flex;flex-direction:column;gap:6px;align-items:center;background:#ffffff0a}
+@media(max-width:520px){
+#shopPanel{width:100%;height:min(52vh,420px);align-self:flex-end;border-radius:16px 16px 0 0;box-shadow:0 -8px 28px #000a}
+#shop{flex-direction:column;justify-content:flex-end}
+}
 #mb{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:10;padding:6px 16px;font-size:20px;background:#14102acc}
 h1{font-size:clamp(44px,10vw,88px);margin:0;font-weight:400;color:var(--g);letter-spacing:.03em}
-#shop h1{font-size:clamp(34px,7vw,56px)}
+#shop h1{font-size:clamp(28px,6vw,44px);margin:0}
 #shop h2{margin:6px 0 0;font-size:18px;font-weight:400;color:var(--c)}
-#sinfo{display:flex;gap:22px;flex-wrap:wrap;justify-content:center;font-size:18px}
+#sinfo{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;font-size:15px;width:100%}
 #sw{color:var(--g)}#st{opacity:.8}
-#sg,#sc{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;max-width:720px}
-.cd{border:1px solid var(--rc);box-shadow:0 0 14px -6px var(--rc);border-radius:14px;padding:12px;width:150px;display:flex;flex-direction:column;gap:6px;align-items:center;background:#ffffff0a}
 .sw{width:54px;height:54px;border-radius:50%;display:block;box-shadow:inset 0 0 12px #0008}
 .cd b{font-size:15px}.cd .rr{font-size:12px;opacity:.75}.cd button{padding:6px 12px;font-size:14px;width:100%}
 .cd em{font-style:normal;font-size:13px;color:#7dffb0}
@@ -72,14 +78,16 @@ small i{font-style:normal;font-weight:bold}
 <small>ZQSD ou flèches pour piloter, Espace pour foncer, P pour la pause. Sur mobile : glissez un doigt et touchez Dash.<br><i style='color:#ff6b8a'>Cristal rouge</i> : il rebondit, évitez-le. <i style='color:#ff9a3a'>Cristal orange</i> : il vous poursuit. <i style='color:#4dff8f'>PNJ vert</i> : touchez-le pour +1 vie et +10 points, mais il ne reste pas longtemps. <i style='color:#6be3ff'>Lueur cyan</i> : bouclier qui détruit les cristaux. <i style='color:#c58bff'>Lueur violette</i> : gèle les cristaux. <i style='color:#ff7ad9'>Lueur rose</i> : aimant.</small>
 </div>
 <div id='shop' hidden>
+<div id='shopPanel'>
 <h1>Boutique</h1>
 <div id='sinfo'><span id='sw'></span><span id='st'></span></div>
-<div id='prev'>Touchez « Aperçu » pour voir sur votre personnage</div>
+<div id='prev'>Touchez « Aperçu » — le perso tourne à droite</div>
 <div id='stabs'></div>
 <div id='sg'></div>
 <h2>Ma collection</h2>
 <div id='sc'></div>
 <button id='sx'>Retour</button>
+</div>
 </div>
 <button id='mb' title='Couper ou remettre le son' aria-label='Couper ou remettre le son'>🔊</button>
 <script src='https://cdn.jsdelivr.net/npm/three@0.150.1/build/three.min.js'></script>
