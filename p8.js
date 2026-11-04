@@ -6,7 +6,7 @@ const BROKERS=[
   'wss://test.mosquitto.org:8081/mqtt'
 ];
 let client=null,roomCode=null,mpName='Joueur',myId='',brokerIdx=0,pollOk=false,amHost=false;
-let RP=null,rpName='',rpTarget=null,lastPosSend=0,lastWorldSend=0,lastSeen=0;
+let RP=null,rpName='',rpTarget=null,lastPosSend=0,lastWorldSend=0,lastSeen=0,skipOrbUntil=0;
 try{const n=localStorage.getItem('lueursName');if(n&&n.trim())mpName=n.trim().slice(0,12)}catch(e){}
 myId='u'+Math.random().toString(36).slice(2,10)+Date.now().toString(36).slice(-4);
 
@@ -62,18 +62,20 @@ function pub(obj){
   try{client.publish(topic(roomCode),JSON.stringify(Object.assign({id:myId,ts:Date.now()},obj)),{qos:0})}catch(e){}}
 function applyWorld(d){
   if(!d||amHost)return;
+  const now=performance.now();
   try{
     if(Array.isArray(d.o)){
       while(orbs.length<d.o.length)mkOrb();
       while(orbs.length>d.o.length){const o=orbs.pop();S.remove(o)}
       d.o.forEach((s,i)=>{
         const o=orbs[i];if(!o)return;
+        if(now<skipOrbUntil)return;
         o.position.x=s.x;o.position.z=s.z;o.position.y=1;
         if(s.k&&o.userData.k!==s.k)kind(o,s.k);
       });
     }
     if(Array.isArray(d.h)){
-      while(haz.length<d.h.length)mkHaz(d.h[haz.length]&&d.h[haz.length].ty==='c'?'c':'d');
+      while(haz.length<d.h.length)mkHaz((d.h[haz.length]&&d.h[haz.length].ty==='c')?'c':'d');
       while(haz.length>d.h.length){const h=haz.pop();S.remove(h)}
       d.h.forEach((s,i)=>{
         const h=haz[i];if(!h)return;
@@ -82,6 +84,20 @@ function applyWorld(d){
       });
     }
     if(typeof d.wave==='number')wave=d.wave;
+  }catch(e){}
+}
+function applyTake(d){
+  if(!d)return;
+  try{
+    let best=null,bd=9;
+    for(const o of orbs){
+      const dd=Math.hypot(o.position.x-d.ox,o.position.z-d.oz);
+      if(dd<bd){bd=dd;best=o}
+    }
+    if(best&&bd<3.5){
+      if(typeof d.nx==='number'){best.position.set(d.nx,1,d.nz);if(d.nk)kind(best,d.nk)}
+      else{kind(best,rk());best.position.set(rnd(),1,rnd())}
+    }
   }catch(e){}
 }
 function onMsg(raw){
@@ -98,6 +114,7 @@ function onMsg(raw){
     if(RP)RP.visible=true;
   }
   if(d.t==='w')applyWorld(d);
+  if(d.t==='take')applyTake(d);
 }
 function connectBroker(code,asHost){
   if(typeof mqtt==='undefined'){setStatus('Lib MQTT manquante \u2014 recharge la page',false);return}
@@ -151,6 +168,12 @@ function leave(){
   setTimeout(()=>{killClient();setStatus('Session quitt\u00e9e')},150);
 }
 
+window.mpOnTake=function(ox,oz,q,nx,nz,nk){
+  if(!pollOk||!roomCode)return;
+  skipOrbUntil=performance.now()+400;
+  pub({t:'take',ox:+(+ox).toFixed(2),oz:+(+oz).toFixed(2),nx:+(+nx).toFixed(2),nz:+(+nz).toFixed(2),nk,q,name:mpName});
+  if(amHost)lastWorldSend=0;
+};
 window.mpTick=function(dt){
   if(!pollOk||!roomCode)return;
   const now=performance.now();
