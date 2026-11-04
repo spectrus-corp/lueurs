@@ -59,6 +59,11 @@ button:hover,button:focus-visible{background:var(--g);color:var(--bg);outline:no
 button:disabled{opacity:.45;cursor:default;background:transparent;color:var(--g)}
 small{opacity:.75;max-width:48ch;line-height:1.5}
 small i{font-style:normal;font-weight:bold}
+#codeBox{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:center;width:100%;padding:10px 12px;border:1px solid #ffffff22;border-radius:14px;background:#ffffff08;margin:4px 0}
+#codeBox label{font-size:13px;opacity:.85;width:100%;text-align:center;color:var(--c)}
+#cdIn{font:inherit;font-size:15px;padding:8px 14px;border-radius:999px;border:2px solid #ffffff44;background:#0006;color:inherit;width:min(220px,70vw);text-transform:uppercase;letter-spacing:.06em;user-select:text}
+#cdGo{font-size:15px;padding:8px 18px}
+#cdMsg{font-size:13px;min-height:18px;width:100%;text-align:center;opacity:.9}
 </style>
 </head>
 <body>
@@ -86,6 +91,12 @@ small i{font-style:normal;font-weight:bold}
 <div id='sg'></div>
 <h2>Ma collection</h2>
 <div id='sc'></div>
+<div id='codeBox'>
+<label for='cdIn'>Code bonus</label>
+<input id='cdIn' maxlength='24' placeholder='Entrez un code' autocomplete='off' spellcheck='false'>
+<button type='button' id='cdGo'>Valider</button>
+<div id='cdMsg'></div>
+</div>
 <button id='sx'>Retour</button>
 </div>
 </div>
