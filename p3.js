@@ -15,9 +15,11 @@ $('sc').innerHTML=col.map(it=>{const isU=it.t=='u',on=!isU&&eq[it.t]==it.id;
 return `<div class='cd' style='--rc:${RC[it.r]}'><i class='sw' style='background:${sw(it)}'></i><b>${it.n}${it.secret?' ✦':''}</b><span class='rr'>${TN[it.t]}</span>${it.desc?`<span class='tag'>${it.desc}</span>`:''}${isU?`<em>Actif</em>`:`<button data-e='${it.id}' ${on?'disabled':''}>${on?'Équipé':'Équiper'}</button>`}${!isU&&(it.t=='k'||it.t=='t'||it.t=='a')?`<button class='pv' data-p='${it.id}'>Aperçu</button>`:''}</div>`}).join('')}
 function preview(id){const it=find(id);if(!it||it.t=='u')return;previewing=id;
 if(it.t=='k'){setSkin(id);setAcc(eq.a||'a0')}
-else if(it.t=='t')curTrail=it;
-else if(it.t=='a')setAcc(id);
-$('prev').textContent='Aperçu : '+it.n+' — fermez pour annuler, ou équipez pour garder';beep(620,.06,'sine')}
+else if(it.t=='t'){curTrail=it;if(eq.k)setSkin(eq.k)}
+else if(it.t=='a'){setAcc(id);setSkin(eq.k)}
+try{$('shop').style.background='rgba(20,16,42,.45)';$('shop').style.backdropFilter='blur(4px)'}catch(e){}
+$('prev').textContent='Aperçu : '+it.n+' — le personnage tourne · équipez pour garder · Retour pour annuler';beep(620,.06,'sine')}
 function endPreview(){if(!previewing)return;previewing=null;
+try{$('shop').style.background='';$('shop').style.backdropFilter=''}catch(e){}
 try{const e=JSON.parse(localStorage.getItem('lueursE')||'{}');eq.k=e.k||eq.k;eq.t=e.t||eq.t;eq.a=e.a||'a0'}catch(e){}
 setSkin(eq.k);curTrail=find(eq.t);setAcc(eq.a||'a0');$('prev').textContent='Touchez « Aperçu » pour voir sur votre personnage'}
