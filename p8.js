@@ -1,10 +1,16 @@
-/* ---- Multijoueur + chat (PeerJS) ---- */
+/* ---- Multijoueur + chat (MQTT public broker) ---- */
 (function(){
-const PEER_OPTS={debug:0,config:{iceServers:[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:global.stun.twilio.com:3478'}]}};
-let peer=null,conn=null,roomCode=null,isHost=false,mpName='Joueur';
+const BROKERS=[
+  'wss://broker.hivemq.com:8884/mqtt',
+  'wss://broker.emqx.io:8084/mqtt',
+  'wss://test.mosquitto.org:8081/mqtt'
+];
+let client=null,roomCode=null,mpName='Joueur',myId='',brokerIdx=0,pollOk=false;
 try{const n=localStorage.getItem('lueursName');if(n&&n.trim())mpName=n.trim().slice(0,12)}catch(e){}
+myId='u'+Math.random().toString(36).slice(2,10)+Date.now().toString(36).slice(-4);
 
 function genCode(){const c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let s='';for(let i=0;i<6;i++)s+=c[Math.floor(Math.random()*c.length)];return s}
+function topic(code){return 'lueurs/mp/v1/'+String(code).toUpperCase()}
 function setStatus(t,ok){const el=$('mpStatus');if(!el)return;el.textContent=t||'';el.style.color=ok===false?'var(--r)':ok===true?'var(--g)':'var(--c)'}
 function chatAdd(kind,text,name){
   const log=$('chatLog');if(!log)return;
@@ -17,85 +23,89 @@ function openChatUI(){
   document.body.classList.add('mp-on');
   $('chat').hidden=false;$('chat').classList.add('open');
   $('chatCode').textContent=roomCode||'\u2014';
-  $('chatBtn').hidden=false}
+  $('chatBtn').hidden=false;
+  $('mpLeave').hidden=false}
 function closeChatUI(){
   document.body.classList.remove('mp-on');
   $('chat').hidden=true;$('chat').classList.remove('open');
   $('chatBtn').hidden=true}
-function killPeer(){
-  try{if(conn)conn.close()}catch(e){}
-  try{if(peer)peer.destroy()}catch(e){}
-  conn=null;peer=null;roomCode=null;isHost=false;
+function killClient(){
+  try{if(client){client.end(true);client=null}}catch(e){}
+  roomCode=null;pollOk=false;
   closeChatUI();
-  $('mpCodeBox').hidden=true;$('mpLeave').hidden=true;
+  try{$('mpCodeBox').hidden=true;$('mpLeave').hidden=true}catch(e){}
   setStatus('')}
-function wireConn(c){
-  conn=c;
-  c.on('open',()=>{
-    setStatus('Connect\u00e9 avec ton pote !',true);
-    chatAdd('sys','Connect\u00e9 \u2014 vous pouvez chatter');
-    openChatUI();
-    try{c.send({t:'hello',name:mpName})}catch(e){}
-    $('mpLeave').hidden=false;
-  });
-  c.on('data',d=>{
-    if(!d||typeof d!=='object')return;
-    if(d.t==='chat'&&d.msg)chatAdd('them',String(d.msg).slice(0,200),d.name||'Pote');
-    if(d.t==='hello'){$('chatPeer').textContent='avec '+(d.name||'pote');chatAdd('sys',(d.name||'Un joueur')+' a rejoint')}
-  });
-  c.on('close',()=>{chatAdd('sys','Connexion ferm\u00e9e');setStatus('D\u00e9connect\u00e9',false);conn=null});
-  c.on('error',()=>{setStatus('Erreur de lien',false)});
+function pub(obj){
+  if(!client||!roomCode)return;
+  try{client.publish(topic(roomCode),JSON.stringify(Object.assign({id:myId,ts:Date.now()},obj)),{qos:0})}catch(e){}}
+function onMsg(raw){
+  let d;try{d=JSON.parse(raw)}catch(e){return}
+  if(!d||d.id===myId)return;
+  if(d.t==='chat'&&d.msg)chatAdd('them',String(d.msg).slice(0,200),d.name||'Pote');
+  if(d.t==='join'){chatAdd('sys',(d.name||'Un joueur')+' a rejoint');$('chatPeer').textContent='avec '+(d.name||'pote');pub({t:'here',name:mpName})}
+  if(d.t==='here'){$('chatPeer').textContent='avec '+(d.name||'pote');chatAdd('sys',(d.name||'Pote')+' est en ligne')}
+  if(d.t==='bye'){chatAdd('sys',(d.name||'Pote')+' a quitt\u00e9');$('chatPeer').textContent=''}
 }
-function hostSession(){
-  killPeer();
-  const code=genCode();
-  roomCode=code;isHost=true;
-  setStatus('Cr\u00e9ation de la session\u2026');
-  $('mpCodeBox').hidden=false;$('mpCodeBox').textContent=code;
-  peer=new Peer(code,PEER_OPTS);
-  peer.on('open',id=>{
-    roomCode=id;setStatus('Donne ce code \u00e0 ton pote',true);
-    $('mpCodeBox').textContent=id;$('mpLeave').hidden=false;
-    openChatUI();chatAdd('sys','Session '+id+' \u2014 en attente\u2026');
+function connectBroker(code,asHost){
+  if(typeof mqtt==='undefined'){setStatus('Lib MQTT manquante \u2014 recharge la page',false);return}
+  killClient();
+  roomCode=code.toUpperCase();
+  setStatus('Connexion au salon\u2026');
+  $('mpCodeBox').hidden=false;$('mpCodeBox').textContent=roomCode;
+  const url=BROKERS[brokerIdx%BROKERS.length];
+  let settled=false;
+  try{client=mqtt.connect(url,{clientId:'lueurs_'+myId,clean:true,reconnectPeriod:2000,connectTimeout:8000})}
+  catch(e){setStatus('\u00c9chec connexion broker',false);return}
+  const failTimer=setTimeout(()=>{
+    if(settled)return;
+    settled=true;
+    try{client.end(true)}catch(e){}
+    client=null;brokerIdx++;
+    if(brokerIdx<BROKERS.length){setStatus('Broker lent, essai suivant\u2026');connectBroker(code,asHost)}
+    else setStatus('Impossible de rejoindre le r\u00e9seau (r\u00e9essaie)',false);
+  },9000);
+  client.on('connect',()=>{
+    if(settled&&pollOk)return;
+    settled=true;pollOk=true;clearTimeout(failTimer);
+    client.subscribe(topic(roomCode),{qos:0},err=>{
+      if(err){setStatus('Abonnement \u00e9chou\u00e9',false);return}
+      setStatus(asHost?'Donne ce code \u00e0 ton pote':'Dans le salon !',true);
+      openChatUI();
+      chatAdd('sys','Salon '+roomCode+(asHost?' \u2014 en attente\u2026':''));
+      pub({t:'join',name:mpName});
+    });
   });
-  peer.on('connection',c=>{wireConn(c)});
-  peer.on('error',err=>{
-    const m=String(err&&err.type||err||'');
-    if(m.includes('taken')||m.includes('unavailable')){setStatus('Code pris, nouvel essai\u2026');setTimeout(hostSession,300)}
-    else setStatus('Erreur : '+m,false);
-  });
+  client.on('message',(t,payload)=>{onMsg(payload.toString())});
+  client.on('error',()=>{});
+  client.on('close',()=>{if(pollOk&&roomCode)setStatus('Reconnect\u2026',false)});
 }
+function hostSession(){connectBroker(genCode(),true)}
 function joinSession(){
   const code=($('mpIn').value||'').trim().toUpperCase().replace(/[^A-Z0-9]/g,'');
   $('mpIn').value=code;
   if(code.length<4){setStatus('Code trop court',false);return}
-  killPeer();
-  roomCode=code;isHost=false;
-  setStatus('Connexion\u2026');
-  peer=new Peer(PEER_OPTS);
-  peer.on('open',()=>{
-    const c=peer.connect(code,{reliable:true});
-    wireConn(c);
-  });
-  peer.on('error',err=>setStatus('Impossible de rejoindre ('+((err&&err.type)||'err')+')',false));
+  connectBroker(code,false);
 }
 function sendChat(msg){
   msg=String(msg||'').trim().slice(0,200);
   if(!msg)return;
   chatAdd('me',msg,mpName);
-  if(conn&&conn.open)try{conn.send({t:'chat',msg,name:mpName})}catch(e){}
-  else chatAdd('sys','Pas encore connect\u00e9 \u00e0 ton pote');
+  if(!client||!pollOk){chatAdd('sys','Pas encore connect\u00e9');return}
+  pub({t:'chat',msg,name:mpName});
+}
+function leave(){
+  pub({t:'bye',name:mpName});
+  setTimeout(()=>{killClient();setStatus('Session quitt\u00e9e')},150);
 }
 
-$('bm').onclick=()=>{$('msg').hidden=true;$('mp').hidden=false;setStatus(roomCode?('Session '+roomCode):'')};
+$('bm').onclick=()=>{$('msg').hidden=true;$('mp').hidden=false;setStatus(roomCode?('Salon '+roomCode):'')};
 $('mpBack').onclick=()=>{$('mp').hidden=true;if(!run)$('msg').hidden=false};
-$('mpNew').onclick=()=>hostSession();
-$('mpJoin').onclick=()=>joinSession();
-$('mpIn').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();joinSession()}});
-$('mpLeave').onclick=()=>{killPeer();setStatus('Session quitt\u00e9e');$('mpLeave').hidden=true};
+$('mpNew').onclick=()=>{brokerIdx=0;hostSession()};
+$('mpJoin').onclick=()=>{brokerIdx=0;joinSession()};
+$('mpIn').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();brokerIdx=0;joinSession()}});
+$('mpLeave').onclick=()=>leave();
 $('chatForm').onsubmit=e=>{e.preventDefault();const v=$('chatIn').value;$('chatIn').value='';sendChat(v)};
 $('chatBtn').onclick=()=>{$('chat').classList.toggle('open')};
-$('chatX').onclick=()=>{
-  if(matchMedia('(max-width:800px)').matches)$('chat').classList.remove('open');
-};
+$('chatX').onclick=()=>{if(matchMedia('(max-width:800px)').matches)$('chat').classList.remove('open')};
+addEventListener('pagehide',()=>{try{pub({t:'bye',name:mpName})}catch(e){}});
 })();
