@@ -1,7 +1,7 @@
 function hx(c){return '#'+Number(c).toString(16).padStart(6,'0')}
 function iconHTML(it){
   if(it.t=='u'){
-    const sym={u1:'🧲',u2:'⚡',u3:'💨',u4:'⏱️',u5:'🛡️',u6:'❄️',u7:'✨'}[it.id]||'▲';
+    const sym={u1:'🧲',u2:'⚡',u3:'💨',u4:'⏱️',u5:'🛡️',u6:'❄️',u7:'✨',u8:'💨',u9:'🧲',u10:'⏱️',u11:'💰'}[it.id]||'▲';
     return '<span style="font-size:36px;line-height:1">'+sym+'</span>';
   }
   if(it.t=='a'){
