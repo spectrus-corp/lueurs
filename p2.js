@@ -22,7 +22,7 @@ function upFreezeMul(){return hasU('u6')?1.15:1}
 
 function setSkin(id){const s=find(id);curSkin=s;if(bd){P.remove(bd);bd.geometry.dispose()}
 const G={cone:()=>{const q=new THREE.ConeGeometry(.7,1.7,6);q.rotateX(Math.PI/2);return q},cyl:()=>{const q=new THREE.CylinderGeometry(.35,.6,1.7,8);q.rotateX(Math.PI/2);return q},oct:()=>new THREE.OctahedronGeometry(.95),tet:()=>new THREE.TetrahedronGeometry(1.05),ico:()=>new THREE.IcosahedronGeometry(.85),dod:()=>new THREE.DodecahedronGeometry(.85),knot:()=>new THREE.TorusKnotGeometry(.55,.2,48,8)};
-bd=new THREE.Mesh(G[s.g](),mk(s.c,s.e,s.i||1));if(s.gh){bd.material.transparent=true;bd.material.opacity=.6}bd.position.y=.8;P.add(bd);setAcc(previewing&&find(previewing).t=='a'?previewing:(eq.a||'a0'))}
+bd=new THREE.Mesh(G[s.g](),mk(s.c,s.e,s.i||1));if(s.gh){bd.material.transparent=true;bd.material.opacity=.6}bd.position.y=.8;P.add(bd);setAcc(eq.a||'a0')}
 function setAcc(id){
 if(accM){P.remove(accM);accM.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material){const ms=Array.isArray(o.material)?o.material:[o.material];ms.forEach(m=>m.dispose&&m.dispose())}});accM=null}
 const it=find(id);if(!it||it.t!='a'||!it.g||it.g=='none'||it.id=='a0')return;
@@ -38,7 +38,5 @@ P.add(accM)
 }
 function mkTrail(tr){if(!tr||!tr.c||!tr.c.length)return;const c=tr.c[Math.floor(Math.random()*tr.c.length)];let mt=tcache.get(c);if(!mt){mt=pc(c);tcache.set(c,mt)}
 const m=new THREE.Mesh(pg,mt),j=tr.j||.3,s0=tr.s||1,L=tr.l||.6;
-const back=previewing?1.1:.05;
-m.position.set(P.position.x-Math.sin(P.rotation.y)*back+(Math.random()-.5)*j,.5+Math.random()*.5,P.position.z-Math.cos(P.rotation.y)*back+(Math.random()-.5)*j);
+m.position.set(P.position.x-vel.x*.05+(Math.random()-.5)*j,.5+Math.random()*.5,P.position.z-vel.z*.05+(Math.random()-.5)*j);
 m.userData={life:L,L,up:tr.up||0,s0};m.scale.setScalar(s0);S.add(m);trl.push(m)}
-const hx=c=>'#'+c.toString(16).padStart(6,'0');

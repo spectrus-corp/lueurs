@@ -14,11 +14,6 @@ function tick(){requestAnimationFrame(tick);const dt=Math.min(clk.getDelta(),.05
 for(const o of orbs){o.rotation.y+=dt*2;o.position.y=1+Math.sin(t*3+o.id)*.25}
 if(accM){accM.children.forEach(ch=>{if(ch.userData.spin){ch.position.x=Math.cos(t*2)*.9;ch.position.z=Math.sin(t*2)*.9}if(ch.userData.orbit){ch.position.x=Math.cos(t*1.6)*1.15;ch.position.z=Math.sin(t*1.6)*1.15;ch.rotation.y+=dt*2}});}
 if(curSkin.rb&&bd){const h=(t*.4)%1;bd.material.color.setHSL(h,.8,.65);bd.material.emissive.setHSL(h,.9,.4)}
-/* Aperçu boutique : rotation lente 360° + traînée derrière */
-if(!$('shop').hidden&&previewing){
-  P.rotation.y+=dt*.75;
-  if(curTrail&&curTrail.c&&curTrail.c.length&&trl.length<160){tE-=dt;while(tE<=0){tE+=.028;mkTrail(curTrail)}}
-}
 if(run&&!paused){
 let x=(K.ArrowRight||K.KeyD?1:0)-(K.ArrowLeft||K.KeyA?1:0)+Tv[0],z=(K.ArrowDown||K.KeyS?1:0)-(K.ArrowUp||K.KeyW?1:0)+Tv[1];
 const l=Math.hypot(x,z);if(l>1){x/=l;z/=l}
