@@ -30,3 +30,22 @@ else if(q=='s'){shield=6*upShieldMul();gain(2);banner('Bouclier !');seq([300,450
 else if(q=='f'){freeze=5*upFreezeMul();gain(2);banner('Gel !');seq([900,700,500,350],.07,'sine');noise(.3,6000,.05)}
 else{magnet=7;gain(2);banner('Aimant !');seq([380,480,380,480],.07,'triangle')}
 kind(o,rk());o.position.set(rnd(),1,rnd())}}
+const w=1+Math.floor(got/12);if(w>wave){wave=w;banner('Vague '+w);seq([520,660,780,1040],.12,'triangle');noise(.4,800,.06);if(orbs.length<20)for(let i=0;i<6;i++)mkOrb();if(haz.length<14)mkHaz('c')}
+const spd=(1+got*.015)*(freeze>0?.15:1);let near=99;
+for(const h of haz){const u=h.userData,v=u.v;
+if(u.t=='c'){const dx=P.position.x-h.position.x,dz=P.position.z-h.position.z,d=Math.hypot(dx,dz)||1,s=(3+wave*.4)*(freeze>0?.15:1);near=Math.min(near,d);h.position.x+=dx/d*s*dt;h.position.z+=dz/d*s*dt;h.rotation.x+=dt*2;h.rotation.z+=dt*3}
+else{h.position.x+=v.x*spd*dt;h.position.z+=v.z*spd*dt;if(Math.abs(h.position.x)>A-1)v.x*=-1;if(Math.abs(h.position.z)>A-1)v.z*=-1;h.rotation.x+=dt*1.5;h.rotation.y+=dt*2}
+const d=h.position.distanceTo(P.position);near=Math.min(near,d);
+if(d<1.5){if(shield>0){burst(h.position,'s',10);S.remove(h);haz.splice(haz.indexOf(h),1);shield=0;sh.visible=false;beep(900,.1);noise(.2,4000,.06);continue}
+if(inv<=0){lives--;inv=1.4;flash=.35;vel.multiplyScalar(-.5);burst(P.position,'s',16);noise(.5,200,.12);beep(120,.25,'sawtooth');if(lives<=0)end()}}}
+if(near<8){const f=.04*(1-near/8);C.position.x+= (Math.random()-.5)*f;C.position.y+=(Math.random()-.5)*f}
+if(grn){const u=grn.userData;u.life-=dt;grn.position.x+=u.v.x*dt;grn.position.z+=u.v.z*dt;if(Math.abs(grn.position.x)>A-1)u.v.x*=-1;if(Math.abs(grn.position.z)>A-1)u.v.z*=-1;grn.rotation.y+=dt*2;if(u.life<=0)killGreen();else if(grn.position.distanceTo(P.position)<1.8){lives=Math.min(lives+1,5);gain(10);burst(grn.position,'g',20);killGreen();banner('+1 vie !');seq([523,659,784],.1,'triangle')}}else{greenT-=dt;if(greenT<=0)mkGreen()}
+if(shield>0){shield-=dt;sh.visible=true;sh.material.opacity=.2+.1*Math.sin(t*8)}else sh.visible=false;
+if(freeze>0)freeze-=dt;if(magnet>0)magnet-=dt;if(inv>0)inv-=dt;if(dashCd>0)dashCd-=dt;if(flash>0)flash-=dt;if(bt>0){bt-=dt;$('bn').style.opacity=String(Math.min(1,bt))}
+hud()}
+else if(!run){P.rotation.y+=dt*.5}
+for(let i=bits.length-1;i>=0;i--){const b=bits[i],u=b.userData;u.life-=dt;if(u.life<=0){S.remove(b);bits.splice(i,1);continue}b.position.x+=u.vx*dt;b.position.y+=u.vy*dt;b.position.z+=u.vz*dt;u.vy-=12*dt;b.scale.setScalar(u.life/.6)}
+for(let i=trl.length-1;i>=0;i--){const b=trl[i],u=b.userData;u.life-=dt;if(u.life<=0){S.remove(b);trl.splice(i,1);continue}b.position.y=Math.max(.1,b.position.y+u.up*dt);b.scale.setScalar(u.s0*u.life/u.L)}
+cam.lerp(new THREE.Vector3(P.position.x,16,P.position.z+13),1-Math.exp(-4*dt));C.position.copy(cam);C.lookAt(P.position.x,0,P.position.z-2);
+R.render(S,C)}
+tick();
