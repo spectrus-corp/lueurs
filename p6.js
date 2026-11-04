@@ -1,6 +1,7 @@
 function pause(v){if(!run)return;paused=v;beep(v?300:500,.08,'triangle');if(v)$('bn').textContent='Pause';else bt=0}
 const KD={ArrowUp:'U',KeyW:'U',ArrowDown:'D',KeyS:'D',ArrowLeft:'L',KeyA:'L',ArrowRight:'R',KeyD:'R'};
-const K={};addEventListener('keydown',e=>{K[e.code]=1;if(KD[e.code]&&!e.repeat&&e.target.tagName!='INPUT')dirIn(KD[e.code]);if(e.code=='Escape'&&!$('shop').hidden){closeShop();return}if(e.code=='Space'&&run){e.preventDefault();dash()}if((e.code=='KeyP'||e.code=='Escape')&&run)pause(!paused)});addEventListener('keyup',e=>K[e.code]=0);addEventListener('blur',()=>pause(true));
+const typing=e=>{const t=e&&e.target;return !!(t&&(t.tagName==='INPUT'||t.tagName==='TEXTAREA'||t.isContentEditable))};
+const K={};addEventListener('keydown',e=>{if(typing(e))return;K[e.code]=1;if(KD[e.code]&&!e.repeat)dirIn(KD[e.code]);if(e.code=='Escape'&&!$('shop').hidden){closeShop();return}if(e.code=='Space'&&run){e.preventDefault();dash()}if((e.code=='KeyP'||e.code=='Escape')&&run)pause(!paused)});addEventListener('keyup',e=>K[e.code]=0);addEventListener('blur',()=>pause(true));
 addEventListener('pagehide',save);document.addEventListener('visibilitychange',()=>{if(document.hidden)save()});
 function dash(){if(!run||paused||dashCd>0)return;const d=vel.length()>1?vel.clone().normalize():new THREE.Vector3(Math.sin(P.rotation.y),0,Math.cos(P.rotation.y));vel.addScaledVector(d,32);dashCd=upDashCd();inv=Math.max(inv,.35);burst(P.position,'g',8);noise(.22,2500,.1);beep(700,.1)}
 $('dbtn').addEventListener('pointerdown',dash);
@@ -58,5 +59,6 @@ $('bn').style.opacity=paused?1:Math.min(1,Math.max(bt,0));bt-=dt;
 for(let i=bits.length-1;i>=0;i--){const b=bits[i],u=b.userData;u.life-=dt;if(u.life<=0){S.remove(b);bits.splice(i,1);continue}u.vy-=15*dt;b.position.x+=u.vx*dt;b.position.y=Math.max(.1,b.position.y+u.vy*dt);b.position.z+=u.vz*dt;b.scale.setScalar(u.life/.6)}
 for(let i=trl.length-1;i>=0;i--){const b=trl[i],u=b.userData;u.life-=dt;if(u.life<=0){S.remove(b);trl.splice(i,1);continue}b.position.y=Math.max(.1,b.position.y+u.up*dt);b.scale.setScalar(u.s0*u.life/u.L)}
 cam.lerp(new THREE.Vector3(P.position.x,16,P.position.z+13),1-Math.exp(-4*dt));C.position.copy(cam);C.lookAt(P.position.x,0,P.position.z-2);
+if(window.mpTick)try{window.mpTick(dt)}catch(e){}
 R.render(S,C)}
 tick();
