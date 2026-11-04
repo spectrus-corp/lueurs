@@ -64,6 +64,40 @@ small i{font-style:normal;font-weight:bold}
 #cdIn{font:inherit;font-size:15px;padding:8px 14px;border-radius:999px;border:2px solid #ffffff44;background:#0006;color:inherit;width:min(220px,70vw);text-transform:uppercase;letter-spacing:.06em;user-select:text}
 #cdGo{font-size:15px;padding:8px 18px}
 #cdMsg{font-size:13px;min-height:18px;width:100%;text-align:center;opacity:.9}
+#mp{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:#14102af0;z-index:6;padding:20px;text-align:center;overflow:auto}
+#mp[hidden]{display:none}
+#mp h2{margin:0;color:var(--g);font-weight:400;font-size:clamp(28px,6vw,40px)}
+#mpCodeBox{font-size:28px;letter-spacing:.2em;color:var(--g);padding:12px 20px;border:2px dashed var(--g);border-radius:12px;background:#ffffff0a}
+#mpStatus{min-height:22px;font-size:14px;color:var(--c);opacity:.9}
+#mpJoinRow{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;align-items:center}
+#mpIn{width:min(180px,70vw);text-transform:uppercase;letter-spacing:.12em;text-align:center}
+#chatBtn{position:fixed;top:calc(12px + env(safe-area-inset-top,0px));right:14px;z-index:8;padding:10px 14px;font-size:18px;display:none;background:#14102acc}
+#chat{position:fixed;z-index:7;display:flex;flex-direction:column;background:#120e24f2;border:1px solid #ffffff22;backdrop-filter:blur(10px);overflow:hidden}
+#chat[hidden]{display:none}
+#chatHead{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px;border-bottom:1px solid #ffffff18;font-size:13px;color:var(--c);flex-shrink:0}
+#chatHead b{color:var(--g);letter-spacing:.08em}
+#chatX{padding:4px 12px;font-size:16px;min-width:auto}
+#chatLog{flex:1;overflow-y:auto;padding:10px 12px;display:flex;flex-direction:column;gap:6px;font-size:13px;line-height:1.35;user-select:text;touch-action:pan-y}
+#chatLog .sys{opacity:.65;font-style:italic;text-align:center}
+#chatLog .me{align-self:flex-end;background:#ffd36b22;border:1px solid #ffd36b44;padding:6px 10px;border-radius:12px 12px 4px 12px;max-width:90%;color:var(--g)}
+#chatLog .them{align-self:flex-start;background:#6be3ff18;border:1px solid #6be3ff33;padding:6px 10px;border-radius:12px 12px 12px 4px;max-width:90%;color:#c8f0ff}
+#chatLog .nm{font-size:10px;opacity:.7;display:block;margin-bottom:2px}
+#chatForm{display:flex;gap:6px;padding:8px;border-top:1px solid #ffffff18;flex-shrink:0}
+#chatForm input{flex:1;width:auto;font-size:14px;padding:8px 12px;min-width:0;user-select:text;touch-action:auto}
+#mpIn,#cdIn,#chatIn{touch-action:auto;user-select:text}
+#chatForm button{font-size:14px;padding:8px 14px;min-width:auto}
+@media(min-width:801px){
+  #chat{top:0;right:0;bottom:0;width:min(300px,28vw);border-radius:0;border-right:none;border-top:none;border-bottom:none}
+  #chatBtn{display:none !important}
+  body.mp-on #hud{right:min(300px,28vw)}
+}
+@media(max-width:800px){
+  #chat{top:auto;right:10px;bottom:calc(70px + env(safe-area-inset-bottom,0px));left:10px;width:auto;max-height:42vh;border-radius:16px;box-shadow:0 8px 32px #000a}
+  #chatBtn{display:none}
+  body.mp-on #chatBtn{display:block}
+  body.mp-on #chat:not(.open){display:none}
+  body.mp-on #chat.open{display:flex}
+}
 </style>
 </head>
 <body>
@@ -77,7 +111,7 @@ small i{font-style:normal;font-weight:bold}
 <p id='p'>Attrapez les lueurs dorées en enchaînant les prises pour faire monter le combo, et survivez aux cristaux.</p>
 <div id='go' hidden><input id='nm' maxlength='12' placeholder='Votre pseudo' autocomplete='off'><button id='sb'>Envoyer mon score</button></div>
 <div id='board'><h2>Records mondiaux</h2><ol id='bl'><li class='e'>Chargement…</li></ol></div>
-<div class='row'><button id='b'>Jouer</button><button id='bs'>Boutique</button></div>
+<div class='row'><button id='b'>Jouer</button><button id='bs'>Boutique</button><button id='bm'>Multijoueur</button></div>
 <small>ZQSD ou flèches pour piloter, Espace pour foncer, P pour la pause. Sur mobile : glissez un doigt et touchez Dash.<br><i style='color:#ff6b8a'>Cristal rouge</i> : il rebondit, évitez-le. <i style='color:#ff9a3a'>Cristal orange</i> : il vous poursuit. <i style='color:#4dff8f'>PNJ vert</i> : touchez-le pour +1 vie et +10 points, mais il ne reste pas longtemps. <i style='color:#6be3ff'>Lueur cyan</i> : bouclier qui détruit les cristaux. <i style='color:#c58bff'>Lueur violette</i> : gèle les cristaux. <i style='color:#ff7ad9'>Lueur rose</i> : aimant.</small>
 </div>
 <div id='shop' hidden>
@@ -100,8 +134,28 @@ small i{font-style:normal;font-weight:bold}
 <button id='sx'>Retour</button>
 </div>
 </div>
+<div id='mp' hidden>
+<h2>Multijoueur</h2>
+<p style='opacity:.85;max-width:36ch;margin:0'>Crée une session et donne le code à ton pote, ou rejoins avec le sien. Chat en direct pendant la partie.</p>
+<button id='mpNew'>Nouvelle session</button>
+<div id='mpCodeBox' hidden></div>
+<div id='mpJoinRow'>
+<input id='mpIn' maxlength='8' placeholder='CODE' autocomplete='off' spellcheck='false'>
+<button id='mpJoin'>Rejoindre</button>
+</div>
+<div id='mpStatus'></div>
+<button id='mpLeave' hidden>Quitter la session</button>
+<button id='mpBack'>Retour</button>
+</div>
+<button id='chatBtn' type='button' title='Chat' aria-label='Chat'>💬</button>
+<aside id='chat' hidden>
+<div id='chatHead'><span>Session <b id='chatCode'></b></span><span id='chatPeer' style='opacity:.75'></span><button type='button' id='chatX' aria-label='Fermer'>×</button></div>
+<div id='chatLog'></div>
+<form id='chatForm' autocomplete='off'><input id='chatIn' maxlength='200' placeholder='Message…' autocomplete='off'><button type='submit'>Envoyer</button></form>
+</aside>
 <button id='mb' title='Couper ou remettre le son' aria-label='Couper ou remettre le son'>🔊</button>
 <script src='https://cdn.jsdelivr.net/npm/three@0.150.1/build/three.min.js'></script>
+<script src='https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js'></script>
 <script src='p0.js'></script>
 <script src='p1.js'></script>
 <script src='p2.js'></script>
@@ -110,5 +164,6 @@ small i{font-style:normal;font-weight:bold}
 <script src='p5.js'></script>
 <script src='p6.js'></script>
 <script src='p7.js'></script>
+<script src='p8.js'></script>
 </body>
 </html>
