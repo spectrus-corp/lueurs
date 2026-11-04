@@ -1,9 +1,9 @@
-function equip(id){const it=find(id);if(!it||it.t=='u')return;eq[it.t]=id;previewing=null;if(it.t=='k')setSkin(id);else if(it.t=='t')curTrail=it;else if(it.t=='a')setAcc(id);save();renderShop();$('prev').textContent='Équipé : '+it.n}
+function equip(id){const it=find(id);if(!it||it.t=='u')return;eq[it.t]=id;previewing=null;if(it.t=='k')setSkin(id);else if(it.t=='t')curTrail=it;else if(it.t=='a')setAcc(id);save();renderShop();$('prev').classList.remove('on');$('prev').textContent='Équipé : '+it.n+' ✓'}
 function buy(id){const it=CAT.find(i=>i.id==id);if(!it||it.secret||owned.includes(id))return;const pr=priceOf(it);if(wallet<pr)return;wallet-=pr;owned.push(id);if(it.t=='u'){save();renderShop();seq([660,880,1100],.07,'triangle');$('prev').textContent='Amélioration active : '+it.n}else{equip(id);seq([660,880,1100,1320],.07,'triangle')}noise(.12,5000,.04,.05)}
 function tmr(){if($('shop').hidden)return;const rem=6e5-(Date.now()%6e5),m=Math.floor(rem/6e4),s=Math.floor(rem/1e3)%60;$('st').textContent='Actualisation dans '+m+':'+String(s).padStart(2,'0');if(shownSlot!=Math.floor(Date.now()/6e5)){renderShop();seq([800,1000,1200],.07,'sine')}}
 setInterval(tmr,1000);
-$('bs').onclick=()=>{$('shop').hidden=false;renderShop();tmr();seq([500,700],.06)};
-function closeShop(){endPreview();$('shop').hidden=true;seq([700,500],.06)}
+$('bs').onclick=()=>{$('msg').hidden=true;$('shop').hidden=false;P.position.set(0,0,0);renderShop();tmr();seq([500,700],.06)};
+function closeShop(){endPreview();$('shop').hidden=true;if(!run)$('msg').hidden=false;seq([700,500],.06)}
 $('shop').onclick=e=>{const b=e.target.closest('button');if(!b||b.disabled)return;if(b.id=='sx')closeShop();else if(b.dataset.tab){shopTab=b.dataset.tab;renderShop()}else if(b.dataset.b)buy(b.dataset.b);else if(b.dataset.e){equip(b.dataset.e);beep(740,.08,'triangle');noise(.08,3000,.04)}else if(b.dataset.p)preview(b.dataset.p)};
 /* ---- Bouton son ---- */
 function snd(){$('mb').textContent=muted?'🔇':'🔊'}
