@@ -2,7 +2,16 @@ function priceOf(it){return it.p!=null?it.p:PR[it.r]}
 let wallet=0,owned=[],eq={k:'k0',t:'t0',a:'a0'},bd=null,accM=null,curSkin=DEFK,curTrail=DEFT,tE=0,shownSlot=-1,shopTab='all',previewing=null;
 try{wallet=+localStorage.getItem('lueursW')||0;owned=JSON.parse(localStorage.getItem('lueursO')||'[]');eq=Object.assign(eq,JSON.parse(localStorage.getItem('lueursE')||'{}'));muted=localStorage.getItem('lueursM')=='1'}catch(e){}
 if(!eq.a)eq.a='a0';
-function save(){try{localStorage.setItem('lueursW',wallet);localStorage.setItem('lueursO',JSON.stringify(owned));localStorage.setItem('lueursE',JSON.stringify(eq))}catch(e){}}
+function save(){try{localStorage.setItem('lueursW',wallet);localStorage.setItem('lueursO',JSON.stringify(owned));localStorage.setItem('lueursE',JSON.stringify(eq))}catch(e){}
+try{fetch('/api/wallet',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({wallet,owned,eq})}).catch(()=>{})}catch(e){}}
+async function syncWallet(){try{const r=await fetch('/api/wallet',{cache:'no-store'});if(!r.ok)throw 0;const d=await r.json();
+if(typeof d.wallet==='number'&&d.wallet>wallet)wallet=d.wallet;
+if(Array.isArray(d.owned)){for(const id of d.owned){if(typeof id==='string'&&!owned.includes(id))owned.push(id)}}
+if(d.eq&&typeof d.eq==='object'){if(d.eq.k)eq.k=d.eq.k;if(d.eq.t)eq.t=d.eq.t;if(d.eq.a)eq.a=d.eq.a}}catch(e){}
+try{if(!localStorage.getItem('lueursGrant10k')){wallet=Math.max(wallet,10000);localStorage.setItem('lueursGrant10k','1')}}catch(e){wallet=Math.max(wallet,10000)}
+save();try{$('wl').textContent='◈ '+fmt(wallet)}catch(e){}
+try{setSkin(eq.k);curTrail=find(eq.t);setAcc(eq.a||'a0')}catch(e){}}
+syncWallet();
 function hasU(id){return owned.includes(id)}
 function upMagnetR(){return 14+(hasU('u1')?2:0)}
 function upDashCd(){return hasU('u2')?1.35:1.6}
@@ -27,7 +36,9 @@ else if(it.g=='fins'){for(const s of[-1,1]){const m=new THREE.Mesh(new THREE.Con
 else if(it.g=='sat'){const m=new THREE.Mesh(new THREE.BoxGeometry(.18,.18,.18),mat);m.position.set(1.1,1.1,0);m.userData.orbit=1;accM.add(m)}
 P.add(accM)
 }
-function mkTrail(tr){const c=tr.c[Math.floor(Math.random()*tr.c.length)];let mt=tcache.get(c);if(!mt){mt=pc(c);tcache.set(c,mt)}
-const m=new THREE.Mesh(pg,mt),j=tr.j||.3,s0=tr.s||1,L=tr.l||.6;m.position.set(P.position.x-vel.x*.05+(Math.random()-.5)*j,.5+Math.random()*.5,P.position.z-vel.z*.05+(Math.random()-.5)*j);
+function mkTrail(tr){if(!tr||!tr.c||!tr.c.length)return;const c=tr.c[Math.floor(Math.random()*tr.c.length)];let mt=tcache.get(c);if(!mt){mt=pc(c);tcache.set(c,mt)}
+const m=new THREE.Mesh(pg,mt),j=tr.j||.3,s0=tr.s||1,L=tr.l||.6;
+const back=previewing?1.1:.05;
+m.position.set(P.position.x-Math.sin(P.rotation.y)*back+(Math.random()-.5)*j,.5+Math.random()*.5,P.position.z-Math.cos(P.rotation.y)*back+(Math.random()-.5)*j);
 m.userData={life:L,L,up:tr.up||0,s0};m.scale.setScalar(s0);S.add(m);trl.push(m)}
 const hx=c=>'#'+c.toString(16).padStart(6,'0');
