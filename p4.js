@@ -5,6 +5,24 @@ setInterval(tmr,1000);
 $('bs').onclick=()=>{$('msg').hidden=true;$('shop').hidden=false;renderShop();tmr();seq([500,700],.06)};
 function closeShop(){$('shop').hidden=true;if(!run)$('msg').hidden=false;seq([700,500],.06)}
 $('shop').onclick=e=>{const b=e.target.closest('button');if(!b||b.disabled)return;if(b.id=='sx')closeShop();else if(b.dataset.tab){shopTab=b.dataset.tab;renderShop()}else if(b.dataset.b)buy(b.dataset.b);else if(b.dataset.e){equip(b.dataset.e);beep(740,.08,'triangle');noise(.08,3000,.04)}};
+
+/* ---- Codes bonus ---- */
+const CODES={FREEBONUS:{orbs:100000,once:1}};
+function usedCodes(){try{return JSON.parse(localStorage.getItem('lueursCodes')||'[]')}catch(e){return []}}
+function markCode(c){const u=usedCodes();if(!u.includes(c)){u.push(c);try{localStorage.setItem('lueursCodes',JSON.stringify(u))}catch(e){}}}
+function redeem(){const raw=($('cdIn').value||'').trim().toUpperCase().replace(/\s+/g,'');$('cdIn').value=raw;const msg=$('cdMsg');
+if(!raw){msg.textContent='Entrez un code';msg.style.color='var(--r)';return}
+const def=CODES[raw];
+if(!def){msg.textContent='Code invalide';msg.style.color='var(--r)';beep(200,.1,'sawtooth');return}
+if(def.once&&usedCodes().includes(raw)){msg.textContent='Code déjà utilisé';msg.style.color='var(--r)';beep(220,.08,'triangle');return}
+if(def.orbs){wallet+=def.orbs;save();try{$('wl').textContent='◈ '+fmt(wallet);$('sw').textContent='◈ '+fmt(wallet)+' lueurs'}catch(e){}}
+if(def.once)markCode(raw);
+msg.textContent=def.orbs?('+'+fmt(def.orbs)+' lueurs !'):'Bonus activé !';
+msg.style.color='var(--g)';seq([523,659,784,1047],.08,'triangle');noise(.1,4000,.05);
+$('cdIn').value=''}
+$('cdGo').onclick=redeem;
+$('cdIn').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();redeem()}});
+
 /* ---- Bouton son ---- */
 function snd(){$('mb').textContent=muted?'🔇':'🔊'}
 $('mb').onclick=()=>{muted=!muted;try{localStorage.setItem('lueursM',muted?'1':'0')}catch(e){}snd();beep(660,.08)};
