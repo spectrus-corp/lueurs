@@ -19,7 +19,38 @@ canvas{display:block}
 #db{display:block;height:100%;width:100%;background:linear-gradient(90deg,#6be3ff,#7dffb0);border-radius:3px;transform-origin:left center;transition:transform .08s linear}
 #dbtn{display:none!important}
 #fl{position:fixed;inset:0;background:#ff2a55;opacity:0;pointer-events:none}
-#msg{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:#14102ae6;text-align:center;padding:20px;overflow:auto}
+#msg{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:linear-gradient(180deg,#0c0a1cf2 0%,#14102af5 50%,#1a1430f0 100%);text-align:center;padding:16px 16px 28px;overflow:auto}
+#msgHome{display:flex;flex-direction:column;align-items:center;gap:12px;width:min(420px,100%)}
+#msg .tagline{margin:0;opacity:.8;font-size:14px;max-width:36ch;line-height:1.4}
+#menuMain{display:flex;flex-direction:column;gap:10px;width:100%;max-width:320px}
+#menuMain button{width:100%;padding:14px 20px;font-size:18px}
+#menuSec{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;max-width:320px}
+#menuSec button{padding:11px 12px;font-size:15px;opacity:.95}
+#menuSec #bsp{border-color:#c58bff;color:#c58bff}
+#menuSec #bsp:hover{background:#c58bff;color:var(--bg)}
+#menuSec #bsp:disabled{opacity:.4;border-color:#ffffff44;color:#ffffff88}
+#board{background:#ffffff0a;border:1px solid #ffffff18;border-radius:14px;padding:10px 14px;width:100%;max-width:320px;text-align:left}
+#board h2{margin:0 0 6px;font-size:13px;color:var(--c);font-weight:400;opacity:.85;letter-spacing:.04em;text-transform:uppercase}
+#board ol{font-size:14px}
+#board li{padding:2px 0}
+#helpToggle{background:none;border:none;color:var(--c);font-size:13px;padding:4px 8px;opacity:.7;cursor:pointer;text-decoration:underline}
+#helpToggle:hover{opacity:1;background:none;color:var(--c)}
+#helpBox{display:none;font-size:12px;opacity:.75;max-width:40ch;line-height:1.45;text-align:left;padding:10px 12px;border-radius:12px;background:#ffffff08;border:1px solid #ffffff14}
+#helpBox.open{display:block}
+#rankBadge{display:flex;align-items:center;gap:10px;margin:2px 0 4px;padding:8px 14px;border-radius:16px;background:#ffffff0a;border:1px solid #ffffff14}
+#rankBadge .rs{width:52px;height:52px;filter:drop-shadow(0 2px 8px #0006);flex-shrink:0}
+#rankBadge .rn{font-size:15px;color:var(--g);letter-spacing:.03em;text-align:left}
+#rankBadge .rp{font-size:11px;opacity:.7;color:var(--c);text-align:left}
+#rankBadge .rtxt{display:flex;flex-direction:column;align-items:flex-start;gap:2px}
+#spinOverlay{position:fixed;inset:0;z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#0a0818f2;gap:16px;padding:20px}
+#spinOverlay[hidden]{display:none}
+#spinTitle{font-size:22px;color:var(--g);margin:0}
+#spinWrap{position:relative;width:min(300px,80vw);height:min(300px,80vw)}
+#spinWheel{width:100%;height:100%;border-radius:50%;transition:transform 4.2s cubic-bezier(.12,.75,.08,1);box-shadow:0 0 0 6px #ffffff22,0 0 40px #c58bff44;background:#1a1430}
+#spinPin{position:absolute;top:-6px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:12px solid transparent;border-right:12px solid transparent;border-top:22px solid #ffd36b;z-index:2;filter:drop-shadow(0 2px 4px #000a)}
+#spinResult{min-height:28px;font-size:18px;color:var(--g)}
+#spinClose{margin-top:4px}
+#spinHint{font-size:12px;opacity:.65}
 #shop{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;background:#0e0a1ef5;padding:0;overflow:hidden;z-index:5}
 #shop[hidden]{display:none}
 #shopPanel{width:100%;max-width:1100px;height:100%;overflow-y:auto;overflow-x:hidden;padding:16px 18px 32px;display:flex;flex-direction:column;align-items:stretch;gap:12px}
@@ -41,19 +72,13 @@ canvas{display:block}
 .cd button{padding:8px 12px;font-size:14px;width:100%;margin-top:auto}
 .cd em{font-style:normal;font-size:13px;color:#7dffb0;margin-top:auto}
 #sx{align-self:center;margin-top:8px;min-width:160px}
-#rankBadge{display:flex;flex-direction:column;align-items:center;gap:4px;margin:6px 0 2px}
-#rankBadge .rs{width:72px;height:72px;filter:drop-shadow(0 4px 12px #0008)}
-#rankBadge .rn{font-size:16px;color:var(--g);letter-spacing:.04em}
-#rankBadge .rp{font-size:12px;opacity:.75;color:var(--c)}
 #br{border-color:#f59e0b;color:#f59e0b}
 #br:hover,#br:focus-visible{background:#f59e0b;color:var(--bg)}
 #mb{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:10;padding:6px 16px;font-size:20px;background:#14102acc}
 #msg[hidden],#go[hidden]{display:none}
-h1{font-size:clamp(44px,10vw,88px);margin:0;font-weight:400;color:var(--g);letter-spacing:.03em}
+#msg h1,#msgHome h1{font-size:clamp(36px,8vw,64px);margin:0;font-weight:400;color:var(--g);letter-spacing:.03em}
 #shop h2{margin:8px 0 0;font-size:17px;font-weight:400;color:var(--c)}
 .row{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
-#board{background:#ffffff10;border:1px solid #ffffff22;border-radius:16px;padding:14px 18px;min-width:min(320px,90vw);text-align:left}
-#board h2{margin:0 0 8px;font-size:18px;color:var(--c);font-weight:400}
 ol{list-style:none;margin:0;padding:0}
 li{display:flex;justify-content:space-between;padding:3px 0;font-size:17px}
 li b{color:var(--g)}li.e{opacity:.7;justify-content:center;font-size:15px}
@@ -111,13 +136,23 @@ small i{font-style:normal;font-weight:bold}
 <div id='dash'><i id='db'></i></div>
 <div id='fl'></div>
 <div id='msg'>
+<div id='msgHome'>
 <h1 id='t'>Lueurs</h1>
-<div id='rankBadge'><div class='rs' id='rankSvg'></div><div class='rn' id='rankName'>Débutant</div><div class='rp' id='rankPts'></div></div>
-<p id='p'>Attrapez les lueurs dorées en enchaînant les prises pour faire monter le combo, et survivez aux cristaux.</p>
+<div id='rankBadge'><div class='rs' id='rankSvg'></div><div class='rtxt'><div class='rn' id='rankName'>Débutant</div><div class='rp' id='rankPts'></div></div></div>
+<p id='p' class='tagline'>Attrape les lueurs, enchaîne les combos, survit aux cristaux.</p>
 <div id='go' hidden><input id='nm' maxlength='12' placeholder='Votre pseudo' autocomplete='off'><button id='sb'>Envoyer mon score</button></div>
-<div id='board'><h2>Records mondiaux</h2><ol id='bl'><li class='e'>Chargement…</li></ol></div>
-<div class='row'><button id='b'>Jouer</button><button id='br'>Classé</button><button id='bs'>Boutique</button><button id='bm'>Multijoueur</button></div>
-<small>ZQSD ou flèches pour piloter, maintiens Maj/Espace pour sprinter, P pour la pause. Sur mobile : moitié gauche de l’écran pour bouger, moitié droite pour sprinter (en même temps).<br><i style='color:#ff6b8a'>Cristal rouge</i> : il rebondit, évitez-le. <i style='color:#ff9a3a'>Cristal orange</i> : il vous poursuit. <i style='color:#4dff8f'>PNJ vert</i> : touchez-le pour +1 vie et +10 points, mais il ne reste pas longtemps. <i style='color:#6be3ff'>Lueur cyan</i> : bouclier qui détruit les cristaux. <i style='color:#c58bff'>Lueur violette</i> : gèle les cristaux. <i style='color:#ff7ad9'>Lueur rose</i> : aimant.</small>
+<div id='menuMain'><button id='b'>Jouer</button><button id='br'>Classé</button></div>
+<div id='menuSec'><button id='bs'>Boutique</button><button id='bm'>Multijoueur</button><button id='bsp' type='button'>🎡 Roue du jour</button><button id='helpToggle' type='button'>Aide</button></div>
+<div id='board'><h2>Records</h2><ol id='bl'><li class='e'>Chargement…</li></ol></div>
+<div id='helpBox'>ZQSD / flèches pour bouger · Maj ou Espace pour sprinter · P pause.<br>Mobile : moitié gauche = bouger, moitié droite = sprint.<br><i style='color:#ff6b8a'>Rouge</i> rebondit · <i style='color:#ff9a3a'>Orange</i> te poursuit · <i style='color:#4dff8f'>Vert</i> +1 vie · <i style='color:#6be3ff'>Cyan</i> bouclier · <i style='color:#c58bff'>Violet</i> gel · <i style='color:#ff7ad9'>Rose</i> aimant.</div>
+</div>
+</div>
+<div id='spinOverlay' hidden>
+<h2 id='spinTitle'>Roue du jour</h2>
+<div id='spinWrap'><div id='spinPin'></div><canvas id='spinWheel' width='300' height='300'></canvas></div>
+<div id='spinResult'></div>
+<div id='spinHint'>1 tour gratuit par jour</div>
+<button id='spinClose' type='button'>Fermer</button>
 </div>
 <div id='shop' hidden>
 <div id='shopPanel'>
