@@ -50,7 +50,7 @@ if(vel.length()>.8)P.rotation.y=Math.atan2(vel.x,vel.z);
 if(curTrail.c.length&&vel.length()>1.5&&trl.length<180){tE-=dt;while(tE<=0){tE+=.035;mkTrail(curTrail)}}
 if(t-lastT>upComboWin()){if(combo>=3)seq([440,370,300],.07,'triangle');combo=1}
 for(const o of orbs){const dx=P.position.x-o.position.x,dz=P.position.z-o.position.z,d=Math.hypot(dx,dz);
-if(magnet>0&&d<upMagnetR()&&d>.1){o.position.x+=dx/d*16*dt;o.position.z+=dz/d*16*dt}
+if(magnet>0&&d<upMagnetR()&&d>.08){const pull=(typeof upMagnetSp==='function'?upMagnetSp():55)*(0.55+0.9*(1-Math.min(1,d/upMagnetR())));o.position.x+=dx/d*pull*dt;o.position.z+=dz/d*pull*dt}
 if(d<1.6){const q=o.userData.k,ox=o.position.x,oz=o.position.z;burst(o.position,q);
 if(q=='g'){combo=t-lastT<upComboWin()?Math.min(combo+1,5):1;lastT=t;gain(combo+(hasU('u7')&&got%8==7?1:0)+(hasU('u11')&&got%10==9?2:0));got++;beep(480+combo*90,.08);noise(.05,3500,.04);if(combo==5)beep(1500,.1,'sine',.06);if(got%(ranked?4:5)==0&&haz.length<(ranked?16:14))mkHaz('d')}
 else if(q=='s'){shield=6*upShieldMul();gain(2);banner('Bouclier !');seq([300,450,600],.08,'triangle')}
