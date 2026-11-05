@@ -91,6 +91,89 @@ $('b').onclick=()=>start(false);
 try{$('br').onclick=()=>start(true)}catch(e){}
 $('sb').onclick=async()=>{const name=$('nm').value.trim();if(name.length<2){$('nm').focus();return}try{localStorage.setItem('lueursName',name)}catch(e){}$('sb').disabled=true;
 try{const r=await fetch('/api/score',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,score})});if(!r.ok)throw 0;$('go').hidden=true;$('p').textContent='Score envoyé au classement mondial.';seq([523,659,784,1047],.1,'triangle');board()}catch(e){$('sb').disabled=false;$('p').textContent='Envoi impossible, réessayez.';beep(150,.25,'sawtooth')}};
+
+/* ---- Roue du jour ---- */
+const SPIN=[
+{label:'300 ◈',type:'orbs',n:300,w:22,col:'#3a2f6e'},
+{label:'800 ◈',type:'orbs',n:800,w:18,col:'#2a4a6e'},
+{label:'1 500 ◈',type:'orbs',n:1500,w:14,col:'#2a6e4a'},
+{label:'3 000 ◈',type:'orbs',n:3000,w:8,col:'#6e5a2a'},
+{label:'8 000 ◈',type:'orbs',n:8000,w:3,col:'#6e3a2a'},
+{label:'+15 pts rang',type:'rank',n:15,w:12,col:'#5a2a6e'},
+{label:'+40 pts rang',type:'rank',n:40,w:5,col:'#6e2a5a'},
+{label:'Néon',type:'item',id:'t5',w:6,col:'#4a2a6e'},
+{label:'Halo',type:'item',id:'a1',w:6,col:'#2a5a6e'},
+{label:'Braise',type:'item',id:'k1',w:6,col:'#6e4a2a'}
+];
+function spinDayKey(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function spunToday(){try{return localStorage.getItem('lueursSpin')===spinDayKey()}catch(e){return false}}
+function markSpun(){try{localStorage.setItem('lueursSpin',spinDayKey())}catch(e){}}
+function updateSpinBtn(){const b=$('bsp');if(!b)return;if(spunToday()){b.disabled=true;b.textContent='🎡 Déjà tourné'}else{b.disabled=false;b.textContent='🎡 Roue du jour'}}
+function pickSpin(){
+  const tot=SPIN.reduce((s,x)=>s+x.w,0);let r=Math.random()*tot;
+  for(let i=0;i<SPIN.length;i++){r-=SPIN[i].w;if(r<=0)return i}
+  return SPIN.length-1;
+}
+function drawWheel(){
+  const c=$('spinWheel');if(!c)return;const ctx=c.getContext('2d'),N=SPIN.length,R=150,seg=Math.PI*2/N;
+  ctx.clearRect(0,0,300,300);ctx.save();ctx.translate(150,150);
+  for(let i=0;i<N;i++){
+    const a0=i*seg-Math.PI/2,a1=a0+seg;
+    ctx.beginPath();ctx.moveTo(0,0);ctx.arc(0,0,R,a0,a1);ctx.closePath();
+    ctx.fillStyle=SPIN[i].col;ctx.fill();
+    ctx.strokeStyle='#ffffff33';ctx.lineWidth=2;ctx.stroke();
+    ctx.save();ctx.rotate(a0+seg/2);ctx.fillStyle='#fff';ctx.font='bold 11px Georgia,serif';ctx.textAlign='right';ctx.fillText(SPIN[i].label,R-12,4);ctx.restore();
+  }
+  ctx.beginPath();ctx.arc(0,0,28,0,Math.PI*2);ctx.fillStyle='#14102a';ctx.fill();
+  ctx.strokeStyle='#ffd36b';ctx.lineWidth=3;ctx.stroke();
+  ctx.fillStyle='#ffd36b';ctx.font='16px Georgia';ctx.textAlign='center';ctx.fillText('✦',0,6);
+  ctx.restore();
+}
+let spinning=false;
+function grantSpin(idx){
+  const r=SPIN[idx];let msg=r.label;
+  if(r.type==='orbs'){wallet+=r.n;msg='+'+fmt(r.n)+' lueurs'}
+  else if(r.type==='rank'){rankPts+=r.n;saveRank();renderRankBadge();msg='+'+r.n+' pts de rang'}
+  else if(r.type==='item'){
+    if(!owned.includes(r.id)){owned.push(r.id);const it=find(r.id);if(it&&it.t!=='u'){try{equip(r.id)}catch(e){}}msg=(it?it.n:r.id)+' obtenu !'}
+    else{wallet+=1200;msg='Déjà possédé → +1 200 lueurs'}
+  }
+  save();try{$('wl').textContent='◈ '+fmt(wallet);$('sw').textContent='◈ '+fmt(wallet)+' lueurs'}catch(e){}
+  return msg;
+}
+function openSpin(){
+  if(spunToday()){try{banner('Reviens demain !')}catch(e){}return}
+  const ov=$('spinOverlay');if(!ov)return;
+  ov.hidden=false;$('spinResult').textContent='Touche la roue pour lancer';$('spinHint').textContent='1 tour gratuit par jour';
+  const w=$('spinWheel');w.style.transition='none';w.style.transform='rotate(0deg)';
+  drawWheel();spinning=false;
+  w.onclick=()=>{if(spinning||spunToday())return;doSpin()};
+}
+function doSpin(){
+  if(spinning||spunToday())return;spinning=true;
+  const idx=pickSpin(),N=SPIN.length,seg=360/N;
+  const target=360*6+(360-idx*seg-seg/2);
+  const w=$('spinWheel');
+  w.style.transition='none';w.style.transform='rotate(0deg)';
+  void w.offsetWidth;
+  w.style.transition='transform 4.2s cubic-bezier(.12,.75,.08,1)';
+  w.style.transform='rotate('+target+'deg)';
+  $('spinResult').textContent='…';
+  setTimeout(()=>{
+    const msg=grantSpin(idx);markSpun();updateSpinBtn();
+    $('spinResult').textContent=msg;
+    $('spinHint').textContent='Reviens demain pour un nouveau tour';
+    seq([523,659,784,1047],.08,'triangle');noise(.12,4000,.05);spinning=false;
+  },4300);
+}
+function closeSpin(){$('spinOverlay').hidden=true}
+try{
+  $('bsp').onclick=e=>{e.preventDefault();openSpin()};
+  $('spinClose').onclick=closeSpin;
+  $('helpToggle').onclick=()=>{$('helpBox').classList.toggle('open')};
+  updateSpinBtn();
+}catch(e){}
+
 /* ---- Secret : ↑ ↑ ↓ ↓ ← → ← → (clavier ou glissements du doigt sur l’écran d’accueil) ---- */
 const SQ='UUDDLRLR';let sq='',sqT=0,sw0=null;
 function dirIn(d){if(run||!$('shop').hidden)return;const n=performance.now();if(n-sqT>2500)sq='';sqT=n;sq=(sq+d).slice(-8);if(sq==SQ){sq='';secret()}}
