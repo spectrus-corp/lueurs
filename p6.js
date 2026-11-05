@@ -65,7 +65,9 @@ if(u.t=='c'){const dx=P.position.x-h.position.x,dz=P.position.z-h.position.z,d=M
 else{h.position.x+=v.x*dt*spd;h.position.z+=v.z*dt*spd;if(Math.abs(h.position.x)>A-1)v.x*=-1;if(Math.abs(h.position.z)>A-1)v.z*=-1;h.rotation.y+=dt*2;h.rotation.x+=dt}
 if(Math.hypot(h.position.x-P.position.x,h.position.z-P.position.z)<1.6){
 if(shield>0){burst(h.position,'r',16);gain(u.t=='c'?5:3);noise(.2,900,.12);beep(600,.1,'square');away(h)}
-else if(inv<=0){lives--;inv=1.5;flash=.45;burst(P.position,'r',16);noise(.25,400,.15);beep(140,.25,'sawtooth');if(lives<=0){end();break}}}}
+else if(inv<=0){inv=1.5;flash=.45;burst(P.position,'r',16);noise(.25,400,.15);beep(140,.25,'sawtooth');
+if(window.mpPlaying&&window.mpOnHit){if(window.mpOnHit())break}
+else{lives--;if(lives<=0){if(window.mpOnDeath)window.mpOnDeath();else end();break}}}}
 tk-=dt;if(run&&near<9&&tk<=0){tk=.22+near*.05;beep(1300,.02,'square')}
 if(run){
 if(lives==1){heart-=dt;if(heart<=0){heart=1;beep(90,.12,'sine');beep(70,.14,'sine',.18)}}
