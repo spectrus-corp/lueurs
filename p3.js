@@ -17,11 +17,25 @@ function iconHTML(it){
   }
   if(it.t=='t'){
     const cols=(it.c&&it.c.length)?it.c:[0x3a2f6e];
+    const st=it.style||'dots';
     let parts='';
-    for(let i=0;i<5;i++){
-      const col=hx(cols[i%cols.length]);
-      const y=12+i*8,w=28+i*4,x=32-w/2,op=(.35+i*.12).toFixed(2);
-      parts+='<rect x="'+x+'" y="'+y+'" width="'+w+'" height="5" rx="2.5" fill="'+col+'" opacity="'+op+'"/>';
+    if(st==='fluid'){
+      const c0=hx(cols[0]),c1=hx(cols[Math.min(1,cols.length-1)]);
+      parts='<path d="M12 48 Q20 20 32 28 Q44 36 52 12" fill="none" stroke="'+c0+'" stroke-width="10" stroke-linecap="round" opacity=".9"/>';
+      parts+='<path d="M12 48 Q20 20 32 28 Q44 36 52 12" fill="none" stroke="'+c1+'" stroke-width="5" stroke-linecap="round" opacity=".7"/>';
+      parts+='<circle cx="52" cy="12" r="5" fill="'+c0+'"/>';
+    }else if(st==='streak'){
+      for(let i=0;i<4;i++){
+        const col=hx(cols[i%cols.length]);
+        const y=18+i*10;
+        parts+='<rect x="'+(14+i*2)+'" y="'+y+'" width="'+(30-i*4)+'" height="4" rx="2" fill="'+col+'" opacity="'+(0.9-i*0.15)+'"/>';
+      }
+    }else{
+      for(let i=0;i<5;i++){
+        const col=hx(cols[i%cols.length]);
+        const y=12+i*8,w=28+i*4,x=32-w/2,op=(.35+i*.12).toFixed(2);
+        parts+='<rect x="'+x+'" y="'+y+'" width="'+w+'" height="5" rx="2.5" fill="'+col+'" opacity="'+op+'"/>';
+      }
     }
     if(it.up&&it.up>0) parts+='<path d="M32 8 L36 16 L28 16 Z" fill="'+hx(cols[0])+'" opacity=".8"/>';
     return '<svg viewBox="0 0 64 64">'+parts+'</svg>';
@@ -56,7 +70,8 @@ function cardHTML(it,mode){
   }else{
     act=isU?'<em>Actif</em>':'<button data-e="'+it.id+'" '+(on?'disabled':'')+'>'+(on?'Équipé':'Équiper')+'</button>';
   }
-  return '<div class="cd" style="--rc:'+RC[it.r]+'"><div class="ic">'+iconHTML(it)+'</div><b>'+it.n+(it.secret?' ✦':'')+'</b><span class="rr">'+RN[it.r]+' · '+TN[it.t]+'</span>'+(it.desc?'<span class="tag">'+it.desc+'</span>':'')+act+'</div>';
+  const styleTag=it.t=='t'&&it.style?' · '+(it.style==='fluid'?'Fluide':it.style==='streak'?'Traits':'Points'):'';
+  return '<div class="cd" style="--rc:'+RC[it.r]+'"><div class="ic">'+iconHTML(it)+'</div><b>'+it.n+(it.secret?' ✦':'')+'</b><span class="rr">'+RN[it.r]+' · '+TN[it.t]+styleTag+'</span>'+(it.desc?'<span class="tag">'+it.desc+'</span>':'')+act+'</div>';
 }
 function renderShop(){const slot=Math.floor(Date.now()/6e5);shownSlot=slot;$('sw').textContent='◈ '+fmt(wallet)+' lueurs';
 $('stabs').innerHTML=[['all','Tout'],['k','Skins'],['t','Traînées'],['a','Accessoires'],['u','Améliorations']].map(([id,lb])=>'<button data-tab="'+id+'" class="'+(shopTab==id?'on':'')+'">'+lb+'</button>').join('');
