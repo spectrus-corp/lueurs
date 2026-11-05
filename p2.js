@@ -14,7 +14,9 @@ try{setSkin(eq.k);curTrail=find(eq.t);setAcc(eq.a||'a0')}catch(e){}}
 syncWallet();
 function hasU(id){return owned.includes(id)}
 function upMagnetR(){return 14+(hasU('u1')?2:0)+(hasU('u9')?2:0)}
-function upDashCd(){return hasU('u8')?1.2:hasU('u2')?1.35:1.6}
+function upStaminaMax(){return hasU('u8')?1.35:hasU('u2')?1.15:1}
+function upSprintDrain(){return hasU('u8')?0.22:hasU('u2')?0.28:0.34}
+function upSprintMul(){return hasU('u3')?1.65:1.55}
 function upSpeed(){return hasU('u3')?1.05:1}
 function upComboWin(){return hasU('u10')?2.35:hasU('u4')?2.0:1.6}
 function upShieldMul(){return hasU('u5')?1.15:1}

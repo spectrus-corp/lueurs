@@ -1,10 +1,22 @@
 function pause(v){if(!run)return;paused=v;beep(v?300:500,.08,'triangle');if(v)$('bn').textContent='Pause';else bt=0}
 const KD={ArrowUp:'U',KeyW:'U',ArrowDown:'D',KeyS:'D',ArrowLeft:'L',KeyA:'L',ArrowRight:'R',KeyD:'R'};
 const typing=e=>{const t=e&&e.target;return !!(t&&(t.tagName==='INPUT'||t.tagName==='TEXTAREA'||t.isContentEditable))};
-const K={};addEventListener('keydown',e=>{if(typing(e))return;K[e.code]=1;if(KD[e.code]&&!e.repeat)dirIn(KD[e.code]);if(e.code=='Escape'&&!$('shop').hidden){closeShop();return}if(e.code=='Space'&&run){e.preventDefault();dash()}if((e.code=='KeyP'||e.code=='Escape')&&run)pause(!paused)});addEventListener('keyup',e=>K[e.code]=0);addEventListener('blur',()=>pause(true));
+const K={};addEventListener('keydown',e=>{if(typing(e))return;K[e.code]=1;if(KD[e.code]&&!e.repeat)dirIn(KD[e.code]);if(e.code=='Escape'&&!$('shop').hidden){closeShop();return}if(e.code=='Space'&&run){e.preventDefault()}if((e.code=='KeyP'||e.code=='Escape')&&run)pause(!paused)});addEventListener('keyup',e=>K[e.code]=0);addEventListener('blur',()=>pause(true));
 addEventListener('pagehide',save);document.addEventListener('visibilitychange',()=>{if(document.hidden)save()});
-function dash(){if(!run||paused||dashCd>0)return;const d=vel.length()>1?vel.clone().normalize():new THREE.Vector3(Math.sin(P.rotation.y),0,Math.cos(P.rotation.y));vel.addScaledVector(d,32);dashCd=upDashCd();inv=Math.max(inv,.35);burst(P.position,'g',8);noise(.22,2500,.1);beep(700,.1)}
-$('dbtn').addEventListener('pointerdown',dash);
+let stamina=1,sprintHeld=false,sprinting=false,extraPtrs=0;
+function isSprintKey(){return !!(K.ShiftLeft||K.ShiftRight||K.Space)}
+$('dbtn').addEventListener('pointerdown',e=>{e.preventDefault();sprintHeld=true});
+$('dbtn').addEventListener('pointerup',()=>{sprintHeld=false});
+$('dbtn').addEventListener('pointercancel',()=>{sprintHeld=false});
+$('dbtn').addEventListener('pointerleave',()=>{sprintHeld=false});
+addEventListener('pointerdown',e=>{
+  if(!run||paused)return;
+  if(e.target.closest&&e.target.closest('button')&&e.target.id!=='dbtn')return;
+  if(e.target.id==='dbtn')return;
+  extraPtrs++;
+});
+addEventListener('pointerup',e=>{extraPtrs=Math.max(0,extraPtrs-1)});
+addEventListener('pointercancel',e=>{extraPtrs=Math.max(0,extraPtrs-1)});
 let T=null,Tv=[0,0];const lim=v=>Math.max(-1,Math.min(1,v));
 addEventListener('pointerdown',e=>{if(paused)pause(false);if(e.target.tagName!='BUTTON'&&run)T=[e.clientX,e.clientY]});
 addEventListener('pointermove',e=>{if(T)Tv=[lim((e.clientX-T[0])/60),lim((e.clientY-T[1])/60)]});
@@ -18,7 +30,13 @@ if(curSkin.rb&&bd){const h=(t*.4)%1;bd.material.color.setHSL(h,.8,.65);bd.materi
 if(run&&!paused){
 let x=(K.ArrowRight||K.KeyD?1:0)-(K.ArrowLeft||K.KeyA?1:0)+Tv[0],z=(K.ArrowDown||K.KeyS?1:0)-(K.ArrowUp||K.KeyW?1:0)+Tv[1];
 const l=Math.hypot(x,z);if(l>1){x/=l;z/=l}
-const k=Math.min(1,5*dt);vel.x+=(x*14*upSpeed()-vel.x)*k;vel.z+=(z*14*upSpeed()-vel.z)*k;
+const moving=Math.hypot(x,z)>0.05;
+const wantSprint=(sprintHeld||isSprintKey()||extraPtrs>=2)&&moving&&stamina>0.02;
+sprinting=!!wantSprint;
+const sp=sprinting?upSprintMul():1;
+const k=Math.min(1,5*dt);vel.x+=(x*14*upSpeed()*sp-vel.x)*k;vel.z+=(z*14*upSpeed()*sp-vel.z)*k;
+if(sprinting){stamina=Math.max(0,stamina-upSprintDrain()*dt);if(stamina<=0){sprinting=false}}
+else{const rate=moving?0.18:0.32;stamina=Math.min(upStaminaMax(),stamina+rate*dt)}
 P.position.x=cl(P.position.x+vel.x*dt);P.position.z=cl(P.position.z+vel.z*dt);
 if(vel.length()>.8)P.rotation.y=Math.atan2(vel.x,vel.z);
 if(curTrail.c.length&&vel.length()>1.5&&trl.length<180){tE-=dt;while(tE<=0){tE+=.035;mkTrail(curTrail)}}
@@ -48,13 +66,12 @@ grn.rotation.y+=dt*3;grn.position.y=1+Math.sin(t*4)*.3;grn.visible=grn.userData.
 if(Math.hypot(grn.position.x-P.position.x,grn.position.z-P.position.z)<1.9){lives=Math.min(lives+1,5);gain(10);burst(grn.position,'n',28);banner('+1 vie   +10');seq([523,659,784,1047,1319],.08,'triangle');noise(.2,5000,.05,.1);killGreen()}
 else if(grn.userData.life<=0){seq([500,400,300],.1,'sine');killGreen()}}
 else{greenT-=dt;if(greenT<=0)mkGreen()}
-const dp=dashCd>0,sp0=shield>0,fp0=freeze>0,mp0=magnet>0;
-inv-=dt;shield-=dt;freeze-=dt;magnet-=dt;dashCd-=dt;flash-=dt;
-if(dp&&dashCd<=0)beep(1000,.05);
+const sp0=shield>0,fp0=freeze>0,mp0=magnet>0;
+inv-=dt;shield-=dt;freeze-=dt;magnet-=dt;flash-=dt;
 if(sp0&&shield<=0)seq([500,400,300],.08,'triangle');if(fp0&&freeze<=0)seq([350,450],.08,'sine');if(mp0&&magnet<=0)seq([480,380],.08,'triangle');
 if(shield>0&&shield<2&&Math.floor(shield*4)!=Math.floor((shield+dt)*4))beep(800,.03,'square');
 P.visible=inv<=0||Math.floor(t*10)%2==0;sh.visible=shield>0;hud()}}
-else if(!run){P.rotation.y+=dt*.5;P.visible=true}
+else if(!run){P.rotation.y+=dt*.5;P.visible=true;stamina=upStaminaMax();sprinting=false}
 $('fl').style.opacity=Math.max(flash,0);
 $('bn').style.opacity=paused?1:Math.min(1,Math.max(bt,0));bt-=dt;
 for(let i=bits.length-1;i>=0;i--){const b=bits[i],u=b.userData;u.life-=dt;if(u.life<=0){S.remove(b);bits.splice(i,1);continue}u.vy-=15*dt;b.position.x+=u.vx*dt;b.position.y=Math.max(.1,b.position.y+u.vy*dt);b.position.z+=u.vz*dt;b.scale.setScalar(u.life/.6)}
