@@ -80,6 +80,9 @@ canvas{display:block}
 #mpPlay{border-color:#7dffb0;color:#7dffb0}
 #mpPlay:hover{background:#7dffb0;color:var(--bg)}
 #mpHud{position:fixed;top:calc(48px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);z-index:6;padding:6px 14px;border-radius:999px;background:#120e24e6;border:1px solid #ffffff22;font-size:13px;pointer-events:none;white-space:nowrap;max-width:92vw;overflow:hidden;text-overflow:ellipsis}
+#syncBox{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:center;width:100%;padding:12px;border:1px solid #6be3ff33;border-radius:14px;background:#6be3ff0a;margin:4px 0}
+#syncBox label{font-size:13px;opacity:.85;width:100%;text-align:center;color:var(--c)}
+#syncIn{font:inherit;font-size:15px;padding:8px 14px;border-radius:999px;border:2px solid #ffffff44;background:#0006;color:inherit;user-select:text;touch-action:auto}
 #mb{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:10;padding:6px 16px;font-size:20px;background:#14102acc}
 #msg[hidden],#go[hidden]{display:none}
 #msg h1,#msgHome h1{font-size:clamp(36px,8vw,64px);margin:0;font-weight:400;color:var(--g);letter-spacing:.03em}
@@ -120,7 +123,7 @@ small i{font-style:normal;font-weight:bold}
 #chatLog .nm{font-size:10px;opacity:.7;display:block;margin-bottom:2px}
 #chatForm{display:flex;gap:6px;padding:8px;border-top:1px solid #ffffff18;flex-shrink:0}
 #chatForm input{flex:1;width:auto;font-size:14px;padding:8px 12px;min-width:0;user-select:text;touch-action:auto}
-#mpIn,#cdIn,#chatIn{touch-action:auto;user-select:text}
+#mpIn,#cdIn,#chatIn,#syncIn{touch-action:auto;user-select:text}
 #chatForm button{font-size:14px;padding:8px 14px;min-width:auto}
 @media(min-width:801px){
   #chat{top:0;right:0;bottom:0;width:min(300px,28vw);border-radius:0;border-right:none;border-top:none;border-bottom:none}
@@ -177,6 +180,17 @@ small i{font-style:normal;font-weight:bold}
 <button type='button' id='cdGo'>Valider</button>
 <div id='cdMsg'></div>
 </div>
+<div id='syncBox'>
+<label>Synchronisation de compte</label>
+<div id='syncOn' style='font-size:13px;opacity:.85;width:100%;text-align:center;color:var(--c)'>Non lié</div>
+<div style='display:flex;flex-wrap:wrap;gap:8px;justify-content:center;width:100%'>
+<button type='button' id='syncGen' style='font-size:14px;padding:8px 14px'>Générer SYNC-</button>
+<button type='button' id='syncClr' style='font-size:14px;padding:8px 14px;opacity:.75'>Détacher</button>
+</div>
+<input id='syncIn' maxlength='16' placeholder='SYNC-XXXXXX' autocomplete='off' spellcheck='false' style='width:min(220px,70vw);text-transform:uppercase;letter-spacing:.06em'>
+<button type='button' id='syncJoin' style='font-size:14px;padding:8px 14px'>Lier cet appareil</button>
+<div id='syncMsg' style='font-size:12px;min-height:16px;width:100%;text-align:center;opacity:.9'></div>
+</div>
 <button id='sx'>Retour</button>
 </div>
 </div>
@@ -212,6 +226,7 @@ small i{font-style:normal;font-weight:bold}
 <script src='p0.js'></script>
 <script src='p1.js'></script>
 <script src='p2.js'></script>
+<script src='p2_rest.js'></script>
 <script src='p3.js'></script>
 <script src='p4.js'></script>
 <script src='p5.js'></script>
