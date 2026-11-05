@@ -7,7 +7,7 @@ let stamina=1,sprintHeld=false,sprinting=false;
 function isSprintKey(){return !!(K.ShiftLeft||K.ShiftRight||K.Space)}
 let movePtr=null,sprintPtr=null,moveOrigin=null,Tv=[0,0];
 const lim=v=>Math.max(-1,Math.min(1,v));
-const touchUI=e=>!!(e.target.closest&&e.target.closest('button,input,textarea,select,#chat,#shop,#mp,#msg,#codeBox'));
+const touchUI=e=>!!(e.target.closest&&e.target.closest('button,input,textarea,select,#chat,#shop,#mp,#msg,#codeBox,#syncBox'));
 addEventListener('pointerdown',e=>{
   if(paused&&run)pause(false);
   if(!run||touchUI(e))return;
@@ -66,8 +66,13 @@ else{h.position.x+=v.x*dt*spd;h.position.z+=v.z*dt*spd;if(Math.abs(h.position.x)
 if(Math.hypot(h.position.x-P.position.x,h.position.z-P.position.z)<1.6){
 if(shield>0){burst(h.position,'r',16);gain(u.t=='c'?5:3);noise(.2,900,.12);beep(600,.1,'square');away(h)}
 else if(inv<=0){inv=1.5;flash=.45;burst(P.position,'r',16);noise(.25,400,.15);beep(140,.25,'sawtooth');
-if(window.mpPlaying&&window.mpOnHit){if(window.mpOnHit())break}
-else{lives--;if(lives<=0){if(window.mpOnDeath)window.mpOnDeath();else end();break}}}}}
+if(window.mpPlaying&&typeof window.mpOnHit==='function'){
+  if(window.mpOnHit()){break}
+}else{
+  lives--;
+  if(lives<=0){end();break}
+}}}}}
+if(run&&lives<=0){end()}
 tk-=dt;if(run&&near<9&&tk<=0){tk=.22+near*.05;beep(1300,.02,'square')}
 if(run){
 if(lives==1){heart-=dt;if(heart<=0){heart=1;beep(90,.12,'sine');beep(70,.14,'sine',.18)}}
