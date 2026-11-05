@@ -67,7 +67,7 @@ if(Math.hypot(h.position.x-P.position.x,h.position.z-P.position.z)<1.6){
 if(shield>0){burst(h.position,'r',16);gain(u.t=='c'?5:3);noise(.2,900,.12);beep(600,.1,'square');away(h)}
 else if(inv<=0){inv=1.5;flash=.45;burst(P.position,'r',16);noise(.25,400,.15);beep(140,.25,'sawtooth');
 if(window.mpPlaying&&window.mpOnHit){if(window.mpOnHit())break}
-else{lives--;if(lives<=0){if(window.mpOnDeath)window.mpOnDeath();else end();break}}}}
+else{lives--;if(lives<=0){if(window.mpOnDeath)window.mpOnDeath();else end();break}}}}}
 tk-=dt;if(run&&near<9&&tk<=0){tk=.22+near*.05;beep(1300,.02,'square')}
 if(run){
 if(lives==1){heart-=dt;if(heart<=0){heart=1;beep(90,.12,'sine');beep(70,.14,'sine',.18)}}
