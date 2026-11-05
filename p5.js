@@ -1,17 +1,30 @@
 /* ---- Mode classé / rangs ---- */
 const RANKS=[
-{id:0,n:'Débutant',need:0,c:'#cd7f32',g:1},
-{id:1,n:'Novice',need:40,c:'#b0b0b0',g:1},
-{id:2,n:'Apprenti',need:100,c:'#6ec6ff',g:2},
-{id:3,n:'Intermédiaire',need:180,c:'#5ad67d',g:2},
-{id:4,n:'Confirmé',need:280,c:'#a78bfa',g:3},
-{id:5,n:'Expert',need:400,c:'#f59e0b',g:3},
-{id:6,n:'Élite',need:550,c:'#f43f5e',g:4},
-{id:7,n:'Maître',need:720,c:'#22d3ee',g:4},
-{id:8,n:'Champion',need:920,c:'#eab308',g:5},
-{id:9,n:'Légende',need:1150,c:'#f97316',g:5},
-{id:10,n:'Mythique',need:1450,c:'#d946ef',g:6},
-{id:11,n:'Immortel',need:1800,c:'#fff7ed',g:6}
+{id:0,n:'Débutant',need:0,c:'#a67c52',g:1},
+{id:1,n:'Novice',need:30,c:'#b0b0b0',g:1},
+{id:2,n:'Apprenti',need:70,c:'#7eb8da',g:1},
+{id:3,n:'Aspirant',need:120,c:'#6ec6ff',g:2},
+{id:4,n:'Intermédiaire',need:180,c:'#5ad67d',g:2},
+{id:5,n:'Aventurier',need:250,c:'#34d399',g:2},
+{id:6,n:'Confirmé',need:330,c:'#a78bfa',g:3},
+{id:7,n:'Vétéran',need:420,c:'#8b5cf6',g:3},
+{id:8,n:'Expert',need:520,c:'#f59e0b',g:3},
+{id:9,n:'Stratège',need:630,c:'#fb923c',g:4},
+{id:10,n:'Élite',need:750,c:'#f43f5e',g:4},
+{id:11,n:'As',need:880,c:'#fb7185',g:4},
+{id:12,n:'Maître',need:1020,c:'#22d3ee',g:5},
+{id:13,n:'Grand Maître',need:1180,c:'#06b6d4',g:5},
+{id:14,n:'Champion',need:1360,c:'#eab308',g:5},
+{id:15,n:'Héros',need:1560,c:'#facc15',g:6},
+{id:16,n:'Légende',need:1780,c:'#f97316',g:6},
+{id:17,n:'Mythique',need:2020,c:'#d946ef',g:6},
+{id:18,n:'Éternel',need:2300,c:'#c026d3',g:7},
+{id:19,n:'Divin',need:2600,c:'#e879f9',g:7},
+{id:20,n:'Céleste',need:2950,c:'#a5b4fc',g:7},
+{id:21,n:'Titan',need:3350,c:'#818cf8',g:8},
+{id:22,n:'Immortel',need:3800,c:'#fff7ed',g:8},
+{id:23,n:'Transcendant',need:4300,c:'#fef3c7',g:8},
+{id:24,n:'Absolu',need:5000,c:'#ffffff',g:9}
 ];
 let ranked=false,rankPts=0;
 try{rankPts=+localStorage.getItem('lueursRank')||0}catch(e){}
@@ -20,18 +33,20 @@ function saveRank(){try{localStorage.setItem('lueursRank',rankPts)}catch(e){}}
 function rankShield(rk){
   const c=rk.c||'#cd7f32',g=rk.g||1,id=rk.id;
   let stars='';
-  for(let i=0;i<Math.min(g,6);i++){
+  for(let i=0;i<Math.min(g,8);i++){
     const a=(i/Math.max(g,1))*Math.PI*2-Math.PI/2,x=32+Math.cos(a)*11,y=28+Math.sin(a)*11;
     stars+='<circle cx="'+x+'" cy="'+y+'" r="2.2" fill="#fff" opacity=".9"/>';
   }
-  const rim = id>=8 ? '<path d="M32 4 L36 14 L48 14 L38 22 L42 34 L32 26 L22 34 L26 22 L16 14 L28 14 Z" fill="none" stroke="#fff" stroke-width="1.2" opacity=".5"/>' : '';
-  const gem = id>=5 ? '<circle cx="32" cy="30" r="6" fill="#fff" opacity=".35"/>' : '';
-  const wings = id>=9 ? '<path d="M8 36 Q18 20 28 32" fill="none" stroke="'+c+'" stroke-width="3"/><path d="M56 36 Q46 20 36 32" fill="none" stroke="'+c+'" stroke-width="3"/>' : '';
-  const crown = id>=10 ? '<path d="M22 12 L26 6 L32 12 L38 6 L42 12" fill="none" stroke="#ffd36b" stroke-width="2"/>' : '';
+  const rim = id>=10 ? '<path d="M32 4 L36 14 L48 14 L38 22 L42 34 L32 26 L22 34 L26 22 L16 14 L28 14 Z" fill="none" stroke="#fff" stroke-width="1.2" opacity=".5"/>' : '';
+  const gem = id>=6 ? '<circle cx="32" cy="30" r="6" fill="#fff" opacity=".35"/>' : '';
+  const wings = id>=14 ? '<path d="M8 36 Q18 20 28 32" fill="none" stroke="'+c+'" stroke-width="3"/><path d="M56 36 Q46 20 36 32" fill="none" stroke="'+c+'" stroke-width="3"/>' : '';
+  const crown = id>=18 ? '<path d="M22 12 L26 6 L32 12 L38 6 L42 12" fill="none" stroke="#ffd36b" stroke-width="2"/>' : '';
+  const aura = id>=21 ? '<circle cx="32" cy="28" r="26" fill="none" stroke="'+c+'" stroke-width="1.5" opacity=".35"/>' : '';
+  const core = id>=23 ? '<circle cx="32" cy="30" r="3.5" fill="#ffd36b" opacity=".9"/>' : '';
   return '<svg class="rs" viewBox="0 0 64 64" width="72" height="72" xmlns="http://www.w3.org/2000/svg">'+
     '<defs><linearGradient id="sg'+id+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#fff" stop-opacity=".35"/><stop offset="45%" stop-color="'+c+'"/><stop offset="100%" stop-color="#000" stop-opacity=".35"/></linearGradient>'+
     '<filter id="gl'+id+'"><feGaussianBlur stdDeviation="1.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>'+
-    wings+crown+rim+
+    wings+crown+rim+aura+core+
     '<path filter="url(#gl'+id+')" d="M32 6 C42 6 50 12 50 22 C50 36 40 46 32 56 C24 46 14 36 14 22 C14 12 22 6 32 6 Z" fill="url(#sg'+id+')" stroke="'+c+'" stroke-width="2"/>'+
     '<path d="M32 12 C40 12 45 16 45 23 C45 33 38 41 32 48 C26 41 19 33 19 23 C19 16 24 12 32 12 Z" fill="'+c+'" opacity=".55"/>'+
     gem+stars+
@@ -46,13 +61,13 @@ function rankDiff(){
   if(!ranked)return {haz0:3,orb0:10,lives:3,spd:1,chase:1,greenT:14,waveSpd:1};
   const r=rankOf(rankPts).id;
   return {
-    haz0:3+Math.floor(r/2)+Math.floor(r/6),
-    orb0:Math.max(7,10-Math.floor(r/4)),
-    lives:Math.max(2,3-Math.floor(r/5)),
-    spd:1+r*0.08,
-    chase:1+r*0.1,
-    greenT:14+r*1.2,
-    waveSpd:1+r*0.06
+    haz0:3+Math.floor(r/3)+Math.floor(r/8),
+    orb0:Math.max(7,10-Math.floor(r/5)),
+    lives:Math.max(2,3-Math.floor(r/7)),
+    spd:1+r*0.04,
+    chase:1+r*0.05,
+    greenT:14+r*0.9,
+    waveSpd:1+r*0.03
   };
 }
 renderRankBadge();
