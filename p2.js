@@ -159,8 +159,8 @@ save();try{$('wl').textContent='◈ '+fmt(wallet)}catch(e){}
 try{setSkin(eq.k);curTrail=find(eq.t);setAcc(eq.a||'a0')}catch(e){}}
 syncWallet().then(()=>pullSync());updateSyncUI();
 function hasU(id){return owned.includes(id)}
-function upMagnetR(){return 16+(hasU('u1')?3:0)+(hasU('u9')?3:0)}
-function upMagnetSp(){return 58+(hasU('u1')?12:0)+(hasU('u9')?14:0)}
+function upMagnetR(){return 15+(hasU('u1')?2:0)+(hasU('u9')?2:0)}
+function upMagnetSp(){return 34+(hasU('u1')?8:0)+(hasU('u9')?10:0)}
 function upStaminaMax(){return hasU('u8')?1.35:hasU('u2')?1.15:1}
 function upSprintDrain(){return hasU('u8')?0.22:hasU('u2')?0.28:0.34}
 function upSprintMul(){return hasU('u3')?1.65:1.55}

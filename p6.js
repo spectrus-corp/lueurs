@@ -50,7 +50,7 @@ if(vel.length()>.8)P.rotation.y=Math.atan2(vel.x,vel.z);
 if(curTrail.c.length&&vel.length()>1.5&&trl.length<180){tE-=dt;while(tE<=0){tE+=.035;mkTrail(curTrail)}}
 if(t-lastT>upComboWin()){if(combo>=3)seq([440,370,300],.07,'triangle');combo=1}
 for(const o of orbs){const dx=P.position.x-o.position.x,dz=P.position.z-o.position.z,d=Math.hypot(dx,dz);
-if(magnet>0&&d<upMagnetR()&&d>.08){const pull=(typeof upMagnetSp==='function'?upMagnetSp():55)*(0.55+0.9*(1-Math.min(1,d/upMagnetR())));o.position.x+=dx/d*pull*dt;o.position.z+=dz/d*pull*dt}
+if(magnet>0&&d<upMagnetR()&&d>.08){const pull=(typeof upMagnetSp==='function'?upMagnetSp():34)*(0.5+0.65*(1-Math.min(1,d/upMagnetR())));o.position.x+=dx/d*pull*dt;o.position.z+=dz/d*pull*dt}
 if(d<1.6){const q=o.userData.k,ox=o.position.x,oz=o.position.z;burst(o.position,q);
 if(q=='g'){combo=t-lastT<upComboWin()?Math.min(combo+1,5):1;lastT=t;gain(combo+(hasU('u7')&&got%8==7?1:0)+(hasU('u11')&&got%10==9?2:0));got++;beep(480+combo*90,.08);noise(.05,3500,.04);if(combo==5)beep(1500,.1,'sine',.06);if(got%(ranked?4:5)==0&&haz.length<(ranked?16:14))mkHaz('d')}
 else if(q=='s'){shield=6*upShieldMul();gain(2);banner('Bouclier !');seq([300,450,600],.08,'triangle')}
@@ -59,9 +59,9 @@ else{magnet=7;gain(2);banner('Aimant !');seq([380,480,380,480],.07,'triangle')}
 const nk=rk();kind(o,nk);o.position.set(rnd(),1,rnd());
 try{window.mpOnTake&&window.mpOnTake(ox,oz,q,o.position.x,o.position.z,nk)}catch(e){}}}
 const w=1+Math.floor(got/12);if(w>wave){wave=w;banner('Vague '+w);seq([520,660,780,1040],.12,'triangle');noise(.4,800,.06);if(orbs.length<20)for(let i=0;i<6;i++)mkOrb();if(haz.length<(ranked?16:14)){mkHaz('c');if(ranked&&rankOf(rankPts).id>=4)mkHaz('d')}}
-const _D=typeof rankDiff==='function'?rankDiff():{spd:1,chase:1,waveSpd:1};const spd=(1+got*.015)*_D.spd*(freeze>0?.15:1);let near=99;
+const _D=typeof rankDiff==='function'?rankDiff():{spd:1,chase:1,waveSpd:1};const spd=(1+got*.01)*_D.spd*(freeze>0?.15:1);let near=99;
 for(const h of haz){const u=h.userData,v=u.v;
-if(u.t=='c'){const dx=P.position.x-h.position.x,dz=P.position.z-h.position.z,d=Math.hypot(dx,dz)||1,s=(3+wave*.4)*(_D.chase||1)*(freeze>0?.15:1);near=Math.min(near,d);h.position.x+=dx/d*s*dt;h.position.z+=dz/d*s*dt;h.rotation.y+=dt*3}
+if(u.t=='c'){const dx=P.position.x-h.position.x,dz=P.position.z-h.position.z,d=Math.hypot(dx,dz)||1,s=(2.7+wave*.32)*(_D.chase||1)*(freeze>0?.15:1);near=Math.min(near,d);h.position.x+=dx/d*s*dt;h.position.z+=dz/d*s*dt;h.rotation.y+=dt*3}
 else{h.position.x+=v.x*dt*spd;h.position.z+=v.z*dt*spd;if(Math.abs(h.position.x)>A-1)v.x*=-1;if(Math.abs(h.position.z)>A-1)v.z*=-1;h.rotation.y+=dt*2;h.rotation.x+=dt}
 if(Math.hypot(h.position.x-P.position.x,h.position.z-P.position.z)<1.6){
 if(shield>0){burst(h.position,'r',16);gain(u.t=='c'?5:3);noise(.2,900,.12);beep(600,.1,'square');away(h)}
