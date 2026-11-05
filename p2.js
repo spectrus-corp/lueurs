@@ -70,11 +70,12 @@ function updateSyncUI(){
   }catch(e){}
 }
 setInterval(()=>{if(syncCode&&!run)pullSync()},20000);
+
 async function syncWallet(){try{const r=await fetch('/api/wallet',{cache:'no-store'});if(!r.ok)throw 0;const d=await r.json();
 if(typeof d.wallet==='number'&&d.wallet>wallet)wallet=d.wallet;
 if(Array.isArray(d.owned)){for(const id of d.owned){if(typeof id==='string'&&!owned.includes(id))owned.push(id)}}
 if(d.eq&&typeof d.eq==='object'){if(d.eq.k)eq.k=d.eq.k;if(d.eq.t)eq.t=d.eq.t;if(d.eq.a)eq.a=d.eq.a}}catch(e){}
-try{if(!localStorage.getItem('lueursGrant10k')){wallet=Math.max(wallet,10000);localStorage.setItem('lueursGrant10k','1')}catch(e){wallet=Math.max(wallet,10000)}
+try{if(!localStorage.getItem('lueursGrant10k')){wallet=Math.max(wallet,10000);localStorage.setItem('lueursGrant10k','1')}}catch(e){wallet=Math.max(wallet,10000)}
 save();try{$('wl').textContent='◈ '+fmt(wallet)}catch(e){}
 try{setSkin(eq.k);curTrail=find(eq.t);setAcc(eq.a||'a0')}catch(e){}}
 syncWallet().then(()=>pullSync());updateSyncUI();
@@ -88,3 +89,10 @@ function upSpeed(){return hasU('u3')?1.05:1}
 function upComboWin(){return hasU('u10')?2.35:hasU('u4')?2.0:1.6}
 function upShieldMul(){return hasU('u5')?1.15:1}
 function upFreezeMul(){return hasU('u6')?1.15:1}
+
+try{
+  $('syncGen').onclick=()=>createSyncCode();
+  $('syncJoin').onclick=()=>joinSyncCode(($('syncIn').value||'').trim());
+  $('syncClr').onclick=()=>clearSync();
+  $('syncIn').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();joinSyncCode(($('syncIn').value||'').trim())}});
+}catch(e){}
