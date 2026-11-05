@@ -71,7 +71,7 @@ if(window.mpPlaying&&typeof window.mpOnHit==='function'){
 }else{
   lives--;
   if(lives<=0){end();break}
-}}}}}
+}}}}
 if(run&&lives<=0){end()}
 tk-=dt;if(run&&near<9&&tk<=0){tk=.22+near*.05;beep(1300,.02,'square')}
 if(run){
