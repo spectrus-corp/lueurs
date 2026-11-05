@@ -74,6 +74,12 @@ canvas{display:block}
 #sx{align-self:center;margin-top:8px;min-width:160px}
 #br{border-color:#f59e0b;color:#f59e0b}
 #br:hover,#br:focus-visible{background:#f59e0b;color:var(--bg)}
+#mpModes button{font-size:14px;padding:8px 16px;opacity:.7}
+#mpModes button.on{opacity:1;background:var(--g);color:var(--bg);border-color:var(--g)}
+#mpModeBattle.on{background:#f43f5e;border-color:#f43f5e;color:#fff}
+#mpPlay{border-color:#7dffb0;color:#7dffb0}
+#mpPlay:hover{background:#7dffb0;color:var(--bg)}
+#mpHud{position:fixed;top:calc(48px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);z-index:6;padding:6px 14px;border-radius:999px;background:#120e24e6;border:1px solid #ffffff22;font-size:13px;pointer-events:none;white-space:nowrap;max-width:92vw;overflow:hidden;text-overflow:ellipsis}
 #mb{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:10;padding:6px 16px;font-size:20px;background:#14102acc}
 #msg[hidden],#go[hidden]{display:none}
 #msg h1,#msgHome h1{font-size:clamp(36px,8vw,64px);margin:0;font-weight:400;color:var(--g);letter-spacing:.03em}
@@ -176,7 +182,12 @@ small i{font-style:normal;font-weight:bold}
 </div>
 <div id='mp' hidden>
 <h2>Multijoueur</h2>
-<p style='opacity:.85;max-width:36ch;margin:0'>Crée une session et donne le code à ton pote, ou rejoins avec le sien. Chat en direct pendant la partie.</p>
+<p style='opacity:.85;max-width:36ch;margin:0'>Choisis un mode, crée un salon et envoie le code à ton pote.</p>
+<div id='mpModes' style='display:flex;gap:8px;flex-wrap:wrap;justify-content:center'>
+<button type='button' id='mpModeCoop' class='on'>Collecte</button>
+<button type='button' id='mpModeBattle'>Battle</button>
+</div>
+<p id='mpModeDesc' style='opacity:.75;max-width:36ch;margin:0;font-size:13px;line-height:1.4'>Collecte commune : score d’équipe, vies partagées, objectif à atteindre ensemble.</p>
 <button id='mpNew'>Nouvelle session</button>
 <div id='mpCodeBox' hidden></div>
 <div id='mpJoinRow'>
@@ -184,9 +195,11 @@ small i{font-style:normal;font-weight:bold}
 <button id='mpJoin'>Rejoindre</button>
 </div>
 <div id='mpStatus'></div>
+<button id='mpPlay' hidden type='button'>Lancer la partie</button>
 <button id='mpLeave' hidden>Quitter la session</button>
 <button id='mpBack'>Retour</button>
 </div>
+<div id='mpHud' hidden></div>
 <button id='chatBtn' type='button' title='Chat' aria-label='Chat'>💬</button>
 <aside id='chat' hidden>
 <div id='chatHead'><span>Session <b id='chatCode'></b></span><span id='chatPeer' style='opacity:.75'></span><button type='button' id='chatX' aria-label='Fermer'>×</button></div>
