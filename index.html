@@ -41,6 +41,12 @@ canvas{display:block}
 .cd button{padding:8px 12px;font-size:14px;width:100%;margin-top:auto}
 .cd em{font-style:normal;font-size:13px;color:#7dffb0;margin-top:auto}
 #sx{align-self:center;margin-top:8px;min-width:160px}
+#rankBadge{display:flex;flex-direction:column;align-items:center;gap:4px;margin:6px 0 2px}
+#rankBadge .rs{width:72px;height:72px;filter:drop-shadow(0 4px 12px #0008)}
+#rankBadge .rn{font-size:16px;color:var(--g);letter-spacing:.04em}
+#rankBadge .rp{font-size:12px;opacity:.75;color:var(--c)}
+#br{border-color:#f59e0b;color:#f59e0b}
+#br:hover,#br:focus-visible{background:#f59e0b;color:var(--bg)}
 #mb{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:10;padding:6px 16px;font-size:20px;background:#14102acc}
 #msg[hidden],#go[hidden]{display:none}
 h1{font-size:clamp(44px,10vw,88px);margin:0;font-weight:400;color:var(--g);letter-spacing:.03em}
@@ -106,10 +112,11 @@ small i{font-style:normal;font-weight:bold}
 <div id='fl'></div>
 <div id='msg'>
 <h1 id='t'>Lueurs</h1>
+<div id='rankBadge'><div class='rs' id='rankSvg'></div><div class='rn' id='rankName'>Débutant</div><div class='rp' id='rankPts'></div></div>
 <p id='p'>Attrapez les lueurs dorées en enchaînant les prises pour faire monter le combo, et survivez aux cristaux.</p>
 <div id='go' hidden><input id='nm' maxlength='12' placeholder='Votre pseudo' autocomplete='off'><button id='sb'>Envoyer mon score</button></div>
 <div id='board'><h2>Records mondiaux</h2><ol id='bl'><li class='e'>Chargement…</li></ol></div>
-<div class='row'><button id='b'>Jouer</button><button id='bs'>Boutique</button><button id='bm'>Multijoueur</button></div>
+<div class='row'><button id='b'>Jouer</button><button id='br'>Classé</button><button id='bs'>Boutique</button><button id='bm'>Multijoueur</button></div>
 <small>ZQSD ou flèches pour piloter, maintiens Maj/Espace pour sprinter, P pour la pause. Sur mobile : moitié gauche de l’écran pour bouger, moitié droite pour sprinter (en même temps).<br><i style='color:#ff6b8a'>Cristal rouge</i> : il rebondit, évitez-le. <i style='color:#ff9a3a'>Cristal orange</i> : il vous poursuit. <i style='color:#4dff8f'>PNJ vert</i> : touchez-le pour +1 vie et +10 points, mais il ne reste pas longtemps. <i style='color:#6be3ff'>Lueur cyan</i> : bouclier qui détruit les cristaux. <i style='color:#c58bff'>Lueur violette</i> : gèle les cristaux. <i style='color:#ff7ad9'>Lueur rose</i> : aimant.</small>
 </div>
 <div id='shop' hidden>
