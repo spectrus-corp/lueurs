@@ -55,7 +55,7 @@ if(d<1.6){const q=o.userData.k,ox=o.position.x,oz=o.position.z;burst(o.position,
 if(q=='g'){combo=t-lastT<upComboWin()?Math.min(combo+1,5):1;lastT=t;gain(combo+(hasU('u7')&&got%8==7?1:0)+(hasU('u11')&&got%10==9?2:0));got++;beep(480+combo*90,.08);noise(.05,3500,.04);if(combo==5)beep(1500,.1,'sine',.06);if(got%5==0&&haz.length<14)mkHaz('d')}
 else if(q=='s'){shield=6*upShieldMul();gain(2);banner('Bouclier !');seq([300,450,600],.08,'triangle')}
 else if(q=='f'){freeze=5*upFreezeMul();gain(2);banner('Gel !');seq([900,700,500,350],.07,'sine');noise(.3,6000,.05)}
-else{magnet=7;gain(2);banner('Aimant !';seq([380,480,380,480],.07,'triangle')}
+else{magnet=7;gain(2);banner('Aimant !');seq([380,480,380,480],.07,'triangle')}
 const nk=rk();kind(o,nk);o.position.set(rnd(),1,rnd());
 try{window.mpOnTake&&window.mpOnTake(ox,oz,q,o.position.x,o.position.z,nk)}catch(e){}}}
 const w=1+Math.floor(got/12);if(w>wave){wave=w;banner('Vague '+w);seq([520,660,780,1040],.12,'triangle');noise(.4,800,.06);if(orbs.length<20)for(let i=0;i<6;i++)mkOrb();if(haz.length<14)mkHaz('c')}
