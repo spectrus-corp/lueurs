@@ -15,9 +15,9 @@ canvas{display:block}
 #fx{font-size:15px;color:var(--c);text-align:center;line-height:1.5}
 #l{color:var(--r);font-size:24px}
 #bn{position:fixed;top:22%;left:0;right:0;text-align:center;font-size:clamp(28px,6vw,52px);color:var(--g);pointer-events:none;text-shadow:0 2px 16px #000;opacity:0}
-#dash{position:fixed;left:18px;bottom:calc(18px + env(safe-area-inset-bottom,0px));width:120px;height:8px;border-radius:4px;background:#ffffff22}
-#db{display:block;height:100%;background:var(--g);border-radius:4px;transform-origin:left}
-#dbtn{position:fixed;right:18px;bottom:calc(18px + env(safe-area-inset-bottom,0px));display:none;padding:18px 24px}
+#dash{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(12px + env(safe-area-inset-bottom,0px));width:min(140px,36vw);height:5px;border-radius:3px;background:#ffffff14;opacity:.55;pointer-events:none;z-index:5}
+#db{display:block;height:100%;width:100%;background:linear-gradient(90deg,#6be3ff,#7dffb0);border-radius:3px;transform-origin:left center;transition:transform .08s linear}
+#dbtn{position:fixed;right:14px;bottom:calc(14px + env(safe-area-inset-bottom,0px));display:none;padding:20px 22px;min-width:72px;border-radius:50%;font-size:13px;opacity:.85;user-select:none;-webkit-user-select:none;touch-action:none}
 @media(pointer:coarse){#dbtn{display:block}}
 #fl{position:fixed;inset:0;background:#ff2a55;opacity:0;pointer-events:none}
 #msg{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:#14102ae6;text-align:center;padding:20px;overflow:auto}
@@ -104,7 +104,7 @@ small i{font-style:normal;font-weight:bold}
 <div id='hud'><div><span id='s'>0</span><span id='cb'></span><div id='wl'></div></div><div id='fx'></div><div id='l'></div></div>
 <div id='bn'></div>
 <div id='dash'><i id='db'></i></div>
-<button id='dbtn'>Dash</button>
+<button id='dbtn' type='button'>Sprint</button>
 <div id='fl'></div>
 <div id='msg'>
 <h1 id='t'>Lueurs</h1>
@@ -112,7 +112,7 @@ small i{font-style:normal;font-weight:bold}
 <div id='go' hidden><input id='nm' maxlength='12' placeholder='Votre pseudo' autocomplete='off'><button id='sb'>Envoyer mon score</button></div>
 <div id='board'><h2>Records mondiaux</h2><ol id='bl'><li class='e'>Chargement…</li></ol></div>
 <div class='row'><button id='b'>Jouer</button><button id='bs'>Boutique</button><button id='bm'>Multijoueur</button></div>
-<small>ZQSD ou flèches pour piloter, Espace pour foncer, P pour la pause. Sur mobile : glissez un doigt et touchez Dash.<br><i style='color:#ff6b8a'>Cristal rouge</i> : il rebondit, évitez-le. <i style='color:#ff9a3a'>Cristal orange</i> : il vous poursuit. <i style='color:#4dff8f'>PNJ vert</i> : touchez-le pour +1 vie et +10 points, mais il ne reste pas longtemps. <i style='color:#6be3ff'>Lueur cyan</i> : bouclier qui détruit les cristaux. <i style='color:#c58bff'>Lueur violette</i> : gèle les cristaux. <i style='color:#ff7ad9'>Lueur rose</i> : aimant.</small>
+<small>ZQSD ou flèches pour piloter, maintiens Maj/Espace pour sprinter, P pour la pause. Sur mobile : glisse un doigt pour bouger, appuie avec l’autre (ou Sprint) pour sprinter.<br><i style='color:#ff6b8a'>Cristal rouge</i> : il rebondit, évitez-le. <i style='color:#ff9a3a'>Cristal orange</i> : il vous poursuit. <i style='color:#4dff8f'>PNJ vert</i> : touchez-le pour +1 vie et +10 points, mais il ne reste pas longtemps. <i style='color:#6be3ff'>Lueur cyan</i> : bouclier qui détruit les cristaux. <i style='color:#c58bff'>Lueur violette</i> : gèle les cristaux. <i style='color:#ff7ad9'>Lueur rose</i> : aimant.</small>
 </div>
 <div id='shop' hidden>
 <div id='shopPanel'>
