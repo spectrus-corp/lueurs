@@ -1,4 +1,4 @@
-function equip(id){const it=find(id);if(!it||it.t=='u')return;eq[it.t]=id;if(it.t=='k')setSkin(id);else if(it.t=='t')curTrail=it;else if(it.t=='a')setAcc(id);save();renderShop()}
+function equip(id){const it=find(id);if(!it||it.t=='u')return;eq[it.t]=id;if(it.t=='k')setSkin(id);else if(it.t=='t'){curTrail=it;try{window.clearFluid&&window.clearFluid()}catch(e){}}else if(it.t=='a')setAcc(id);save();renderShop()}
 function buy(id){const it=CAT.find(i=>i.id==id);if(!it||it.secret||owned.includes(id))return;const pr=priceOf(it);if(wallet<pr)return;wallet-=pr;owned.push(id);if(it.t=='u'){save();renderShop();seq([660,880,1100],.07,'triangle')}else{equip(id);seq([660,880,1100,1320],.07,'triangle')}noise(.12,5000,.04,.05)}
 function tmr(){if($('shop').hidden)return;const rem=6e5-(Date.now()%6e5),m=Math.floor(rem/6e4),s=Math.floor(rem/1e3)%60;$('st').textContent='Actualisation dans '+m+':'+String(s).padStart(2,'0');if(shownSlot!=Math.floor(Date.now()/6e5)){renderShop();seq([800,1000,1200],.07,'sine')}}
 setInterval(tmr,1000);
