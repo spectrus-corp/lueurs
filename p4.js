@@ -63,7 +63,7 @@ snd();
 document.addEventListener('click',e=>{const b=e.target.closest('button');if(b&&b.id!='mb'&&!b.disabled)beep(520,.04,'square')});
 /* ---- Jeu ---- */
 function kind(m,k){m.material=om[k];m.userData.k=k;m.scale.setScalar(k=='g'?1:1.4)}
-const rk=()=>{const r=Math.random(),lk=(window.claudeFx?window.claudeFx.luckBonus():0),c=.06+lk;return r<c?'s':r<c*2?'f':r<c*3?'m':r<c*3+.04?'b':'g'};
+const rk=()=>{const r=Math.random(),lk=(window.claudeFx?window.claudeFx.luckBonus():0),c=.06+lk;if(typeof magnet==='number'&&magnet>0){return r<c?'s':r<c*2?'f':r<c*2+.04?'b':'g'}return r<c?'s':r<c*2?'f':r<c*3?'m':r<c*3+.04?'b':'g'};
 function mkOrb(){const m=new THREE.Mesh(og,om.g);m.position.set(rnd(),1,rnd());kind(m,'g');S.add(m);orbs.push(m)}
 function away(m,d=14){do{m.position.set(rnd(),1,rnd())}while(m.position.distanceTo(P.position)<d)}
 function mkHaz(ty='d'){const c=ty=='c',m=new THREE.Mesh(c?tg:hg,c?tm:hm);away(m);const a=Math.random()*6.28,s=3+Math.random()*2.5;m.userData={t:ty,v:new THREE.Vector3(Math.cos(a)*s,0,Math.sin(a)*s)};S.add(m);haz.push(m);if(run)beep(c?200:260,.15,'sawtooth',0)}
