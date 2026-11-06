@@ -145,7 +145,7 @@ async function syncWallet(){try{const r=await fetch('/api/wallet',{cache:'no-sto
 if(typeof d.wallet==='number'&&d.wallet>wallet)wallet=d.wallet;
 if(Array.isArray(d.owned)){for(const id of d.owned){if(typeof id==='string'&&!owned.includes(id))owned.push(id)}}
 if(d.eq&&typeof d.eq==='object'){if(d.eq.k)eq.k=d.eq.k;if(d.eq.t)eq.t=d.eq.t;if(d.eq.a)eq.a=d.eq.a;if(d.eq.v)eq.v=d.eq.v}}catch(e){}
-try{if(!localStorage.getItem('lueursGrant10k')){wallet=Math.max(wallet,10000);localStorage.setItem('lueursGrant10k','1')}catch(e){wallet=Math.max(wallet,10000)}
+try{if(!localStorage.getItem('lueursGrant10k')){wallet=Math.max(wallet,10000);localStorage.setItem('lueursGrant10k','1')}}catch(e){wallet=Math.max(wallet,10000)}
 save();try{$('wl').textContent='◈ '+fmt(wallet)}catch(e){}
 try{setSkin(eq.k);curTrail=find(eq.t);setAcc(eq.a||'a0');if(typeof setCoat==='function')setCoat(eq.v||'v0')}catch(e){}}
 syncWallet().then(()=>pullSync());updateSyncUI();
