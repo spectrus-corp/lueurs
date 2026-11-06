@@ -49,7 +49,7 @@ function qProg(key,val){
 renderQ();
 if(msg0){try{const p=$('p');if(p)p.textContent=msg0+' '+(p.textContent||'')}catch(e){}}
 
-let rings=[],mts=[],jp=null,jt=18,shk=0;
+let rings=[],mts=[],jp=null,jt=18;
 function ring(p,c,sz=8,life=.6){
   try{
     const geo=(typeof RG!=='undefined')?RG:new THREE.RingGeometry(.6,1,24);
@@ -68,7 +68,7 @@ function floaty(txt,p,col){
 }
 function themeWave(){try{const c=new THREE.Color().setHSL((.72+wave*.04)%1,.5,.09);S.background=c;S.fog.color=c.clone()}catch(e){}}
 function bomb(){
-  ring(P.position,0xffa040,26,.7);ring(P.position,0xffffff,14,.5);shk=.7;noise(.5,500,.15);beep(110,.4,'sawtooth');
+  ring(P.position,0xffa040,26,.7);ring(P.position,0xffffff,14,.5);try{shake(1.1)}catch(e){};noise(.5,500,.15);beep(110,.4,'sawtooth');
   for(const h of haz){if(Math.hypot(h.position.x-P.position.x,h.position.z-P.position.z)<13){burst(h.position,'r',14);gain(3);st.dst++;qProg('dst',st.dst);away(h)}}
 }
 function mkJp(){
@@ -142,7 +142,7 @@ window.claudeFx={
     for(let i=mts.length-1;i>=0;i--){
       const mt=mts[i];mt.t-=dt;mt.m.material.opacity=.15+.35*(1-mt.t/1.4)*(Math.floor(t*10)%2?1:.6);
       if(mt.t<=0){
-        burst({x:mt.x,y:1,z:mt.z},'r',24);ring({x:mt.x,y:.15,z:mt.z},0xff3a4a,9,.5);noise(.35,350,.14);beep(90,.3,'sawtooth');shk=.5;
+        burst({x:mt.x,y:1,z:mt.z},'r',24);ring({x:mt.x,y:.15,z:mt.z},0xff3a4a,9,.5);noise(.35,350,.14);beep(90,.3,'sawtooth');try{shake(.9)}catch(e){};
         const px=mt.x,pz=mt.z;S.remove(mt.m);mts.splice(i,1);
         if(run&&shield<=0&&inv<=0&&Math.hypot(px-P.position.x,pz-P.position.z)<3.4){
           if(!(window.mpPlaying&&window.mpOnHit&&window.mpOnHit())){lives--;if(lives<=0)end()}
@@ -156,9 +156,8 @@ window.claudeFx={
         gain(15);st.spc++;qProg('spc',st.spc);burst(jp.position,'j',40);ring(jp.position,0xffe48a,14,.7);floaty('+15 Jackpot',jp.position,'#ffe48a');seq([784,988,1175],.07,'triangle');killJp();
       }else if(jp.userData.life<=0)killJp();
     }else{jt-=dt;if(jt<=0&&run)mkJp()}
-    if(shk>0.01){C.position.x+=(Math.random()-.5)*shk;C.position.y+=(Math.random()-.5)*shk;shk*=.88}
   },
-  reset(){st={got:0,wave:1,cmb:0,dst:0,time:0,grn:0,score:0,spr:0,spc:0,nm:0};killJp();mts.forEach(m=>S.remove(m.m));mts.length=0;rings.forEach(r=>S.remove(r.m));rings.length=0;shk=0;
+  reset(){st={got:0,wave:1,cmb:0,dst:0,time:0,grn:0,score:0,spr:0,spc:0,nm:0};killJp();mts.forEach(m=>S.remove(m.m));mts.length=0;rings.forEach(r=>S.remove(r.m));rings.length=0;
     if(U('st')>0){shield=3*U('st')}
   },
   extraLives(){return U('hp')},
