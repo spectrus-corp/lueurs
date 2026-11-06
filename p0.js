@@ -20,3 +20,8 @@ sh=new THREE.Mesh(new THREE.SphereGeometry(1.35,16,12),new THREE.MeshBasicMateri
 let run=false,paused=false,score=0,best=0,got=0,wave=1,lives=3,combo=1,lastT=0,inv=0,shield=0,freeze=0,magnet=0,flash=0,bt=0,tk=0,heart=0,greenT=14,grn=null,worldBest=0;
 const orbs=[],haz=[],bits=[],trl=[];
 try{best=+localStorage.getItem('lueurs')||0}catch(e){}
+let ac=null,muted=false;
+try{muted=localStorage.getItem('lueursM')=='1'}catch(e){}
+function beep(f,d=.1,ty='sine',w=0){if(muted)return;try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();const o=ac.createOscillator(),g=ac.createGain(),t=ac.currentTime+w;o.type=ty;o.frequency.value=f;g.gain.setValueAtTime(.07,t);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(g);g.connect(ac.destination);o.start(t);o.stop(t+d+.01)}catch(e){}}
+function noise(vol=.1,freq=1000,d=.05,w=0){if(muted)return;try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();const n=2*ac.sampleRate|0,buf=ac.createBuffer(1,n,ac.sampleRate),data=buf.getChannelData(0);for(let i=0;i<n;i++)data[i]=Math.random()*2-1;const s=ac.createBufferSource();s.buffer=buf;const fl=ac.createBiquadFilter();fl.type='bandpass';fl.frequency.value=freq;const gn=ac.createGain(),t=ac.currentTime+w;gn.gain.setValueAtTime(vol,t);gn.gain.exponentialRampToValueAtTime(.001,t+d);s.connect(fl);fl.connect(gn);gn.connect(ac.destination);s.start(t)}catch(e){}}
+function seq(notes,step=.08,ty='triangle',w0=0){notes.forEach((f,i)=>beep(f,step*1.6,ty,w0+i*step))}
