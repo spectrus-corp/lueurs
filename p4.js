@@ -70,6 +70,8 @@ function mkHaz(ty='d'){const c=ty=='c',m=new THREE.Mesh(c?tg:hg,c?tm:hm);away(m)
 function mkGreen(){const m=new THREE.Mesh(ng,nm),l=new THREE.PointLight(0x4dff8f,1.4,10);l.position.y=1;m.add(l);away(m,10);const a=Math.random()*6.28;m.userData={life:14,v:new THREE.Vector3(Math.cos(a)*4.5,0,Math.sin(a)*4.5)};S.add(m);grn=m;banner('Un PNJ vert est apparu !');seq([659,784,988,1319],.08,'triangle')}
 function killGreen(){if(grn)S.remove(grn);grn=null;greenT=(lives>=3?22:12)+Math.random()*8}
 function burst(p,k,n=12){for(let i=0;i<n;i++){const m=new THREE.Mesh(pg,pm[k]);m.position.copy(p);const a=Math.random()*6.28,s=3+Math.random()*5;m.userData={vx:Math.cos(a)*s,vy:2+Math.random()*4,vz:Math.sin(a)*s,life:.6};S.add(m);bits.push(m)}}
+let score=0,got=0,lives=3,run=false,paused=false,inv=0,best=0,combo=1,lastT=-9,shield=0,freeze=0,magnet=0,dashCd=0,flash=0,bt=0,wave=1,greenT=14,worldBest=0,heart=0,tk=0;const vel=new THREE.Vector3();
+try{best=+localStorage.getItem('lueurs')||0}catch(e){}
 function gain(n){score+=n;wallet+=Math.ceil(n*1.8)}
 setSkin(eq.k);curTrail=find(eq.t);
 function banner(s){$('bn').textContent=s;bt=1.8}
