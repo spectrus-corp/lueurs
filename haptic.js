@@ -1,10 +1,9 @@
-/* Aggressive iOS Safari haptic engine for Lueurs — switch + drag + grant */
+/* Lueurs haptic — vibrate ONLY on explicit game events (orbs etc.), never block UI */
 (function(){
   'use strict';
   var ua=navigator.userAgent||'';
   var isIOS=/iPhone|iPad|iPod/.test(ua)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
-  var isAndroid=/Android/i.test(ua);
-  var grantUntil=0, lastPulse=0, pending=0, touching=false, tx=0, ty=0, flip=false;
+  var grantUntil=0, lastPulse=0, flip=false;
   var lab=null, inp=null, ready=false;
 
   function mk(){
@@ -17,63 +16,26 @@
       inp.setAttribute('switch','');
       lab.appendChild(inp);
       lab.setAttribute('aria-hidden','true');
-      lab.style.cssText='position:fixed;left:-200px;top:-200px;width:88px;height:56px;margin:0;padding:0;opacity:0.02;z-index:2147483647;-webkit-tap-highlight-color:transparent;touch-action:none;pointer-events:none;transform-origin:center center;';
-      inp.style.cssText='width:88px;height:56px;margin:0;opacity:0.02;pointer-events:auto;';
+      /* ALWAYS none — must never steal menu clicks */
+      lab.style.cssText='position:fixed;left:-9999px;top:-9999px;width:1px;height:1px;margin:0;padding:0;opacity:0;pointer-events:none!important;z-index:-1;';
+      inp.style.cssText='width:1px;height:1px;margin:0;opacity:0;pointer-events:none!important;';
       (document.body||document.documentElement).appendChild(lab);
       ready=true;
     }catch(e){}
-  }
-
-  function place(x,y){
-    if(!lab)return;
-    lab.style.left=(x-44)+'px';
-    lab.style.top=(y-28)+'px';
   }
 
   function flipSwitch(){
     if(!inp||!lab)return;
     flip=!flip;
     try{
-      lab.style.direction=flip?'rtl':'ltr';
-      lab.style.transform=flip?'scaleX(-1) rotate(0.01deg)':'scaleX(1)';
       inp.checked=!inp.checked;
       lab.click();
     }catch(e){}
   }
 
-  function arm(e){
-    grantUntil=performance.now()+1300;
-    touching=true;
-    if(e){
-      var t=(e.touches&&e.touches[0])||(e.changedTouches&&e.changedTouches[0])||e;
-      if(t&&t.clientX!=null){tx=t.clientX;ty=t.clientY;place(tx,ty);}
-    }
+  function arm(){
+    grantUntil=performance.now()+1400;
     mk();
-    if(lab)lab.style.pointerEvents='auto';
-    flipSwitch();
-    if(pending>0){pending=0;flipSwitch();}
-  }
-
-  function onMove(e){
-    var t=(e.touches&&e.touches[0])||e;
-    if(t&&t.clientX!=null){tx=t.clientX;ty=t.clientY;}
-    touching=true;
-    mk();
-    place(tx,ty);
-    if(lab)lab.style.pointerEvents='auto';
-    if(pending>0 || performance.now()<grantUntil){
-      var now=performance.now();
-      if(now-lastPulse>32){
-        lastPulse=now;
-        if(pending>0)pending--;
-        flipSwitch();
-      }
-    }
-  }
-
-  function onEnd(){
-    touching=false;
-    if(lab)lab.style.pointerEvents='none';
   }
 
   function androidVibrate(ms){
@@ -92,43 +54,42 @@
       var o=ctx.createOscillator();
       var g=ctx.createGain();
       o.type='sine';
-      o.frequency.value=45;
+      o.frequency.value=48;
       var t0=ctx.currentTime;
-      var dur=Math.min(0.08, Math.max(0.02,(ms||30)/1000));
+      var dur=Math.min(0.06,Math.max(0.018,(ms||30)/1200));
       g.gain.setValueAtTime(0.0001,t0);
-      g.gain.exponentialRampToValueAtTime(0.22,t0+0.008);
+      g.gain.exponentialRampToValueAtTime(0.18,t0+0.006);
       g.gain.exponentialRampToValueAtTime(0.0001,t0+dur);
       o.connect(g);g.connect(ctx.destination);
-      o.start(t0);o.stop(t0+dur+0.02);
+      o.start(t0);o.stop(t0+dur+0.015);
     }catch(e){}
   }
 
+  /* ONLY called from game events (shake/buzz), never from touchmove */
   function haptic(ms){
     ms=ms|0;
     if(ms<8)ms=12;
+    var now=performance.now();
+    if(now-lastPulse<40)return;
+    lastPulse=now;
     androidVibrate(ms);
     mk();
-    pending=Math.min(8, pending+Math.max(1, Math.floor(ms/25)));
-    if(touching){
-      place(tx,ty);
-      flipSwitch();
-      pending=Math.max(0,pending-1);
-    } else if(performance.now()<grantUntil){
-      flipSwitch();
-      pending=Math.max(0,pending-1);
+    if(isIOS){
+      if(now<grantUntil){
+        flipSwitch();
+        if(ms>40)setTimeout(flipSwitch,28);
+        if(ms>70)setTimeout(flipSwitch,56);
+      }
     }
     audioThump(ms);
   }
 
+  /* Track gesture grant only — never touch pointer-events or overlay position */
   var opts={capture:true,passive:true};
-  addEventListener('touchstart',arm,opts);
-  addEventListener('touchmove',onMove,opts);
-  addEventListener('touchend',onEnd,opts);
-  addEventListener('touchcancel',onEnd,opts);
-  addEventListener('pointerdown',arm,opts);
-  addEventListener('pointermove',onMove,opts);
-  addEventListener('pointerup',onEnd,opts);
-  addEventListener('pointercancel',onEnd,opts);
+  function onGesture(){arm()}
+  addEventListener('touchstart',onGesture,opts);
+  addEventListener('touchend',onGesture,opts);
+  addEventListener('pointerdown',onGesture,opts);
 
   if(isIOS){
     try{
@@ -144,8 +105,6 @@
 
   window.__haptic=haptic;
   window.__hapticArm=arm;
-  window.__hapticIsIOS=isIOS;
-  window.__hapticIsAndroid=isAndroid;
 
   if(document.readyState==='loading'){
     document.addEventListener('DOMContentLoaded',mk);
