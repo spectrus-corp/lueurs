@@ -62,7 +62,7 @@ canvas{display:block}
 #stabs button{font-size:14px;padding:8px 14px;opacity:.7;border-width:1.5px}
 #stabs button.on{opacity:1;background:var(--g);color:var(--bg);border-color:var(--g)}
 #shopSec{font-size:15px;color:var(--c);opacity:.9;margin:4px 0 0;letter-spacing:.02em}
-#sg,#sc{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;width:100%}
+#sg,#sc,#su{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;width:100%}
 .cd{border:1.5px solid var(--rc);box-shadow:0 0 18px -8px var(--rc);border-radius:16px;padding:14px 12px;display:flex;flex-direction:column;gap:8px;align-items:center;background:#ffffff08;text-align:center;min-height:168px}
 .cd .ic{width:72px;height:72px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .cd .ic svg{width:64px;height:64px;display:block;overflow:visible}
@@ -125,6 +125,14 @@ small i{font-style:normal;font-weight:bold}
 #chatForm input{flex:1;width:auto;font-size:14px;padding:8px 12px;min-width:0;user-select:text;touch-action:auto}
 #mpIn,#cdIn,#chatIn,#syncIn{touch-action:auto;user-select:text}
 #chatForm button{font-size:14px;padding:8px 14px;min-width:auto}
+.fl2{position:fixed;transform:translate(-50%,-50%);font-size:20px;font-weight:bold;pointer-events:none;text-shadow:0 2px 8px #000;z-index:12;animation:fl2up .9s ease-out forwards}
+@keyframes fl2up{to{opacity:0;transform:translate(-50%,-120%)}}
+#qsBox{width:100%;max-width:320px;text-align:left;padding:8px 12px;border-radius:12px;background:#ffffff08;border:1px solid #ffffff14;font-size:13px}
+#qsBox h2{margin:0 0 4px;font-size:12px;color:var(--c);font-weight:400;opacity:.85;text-transform:uppercase;letter-spacing:.04em}
+#qs li{font-size:13px;padding:2px 0}
+#lv{font-size:13px;opacity:.85;color:var(--g);margin-top:4px}
+#pk{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(70px + env(safe-area-inset-bottom,0px));z-index:8;display:flex;gap:8px;align-items:center;padding:10px 14px;border-radius:16px;background:#120e24f0;border:1px solid #ffffff22}
+#pk[hidden]{display:none}
 @media(min-width:801px){
   #chat{top:0;right:0;bottom:0;width:min(300px,28vw);border-radius:0;border-right:none;border-top:none;border-bottom:none}
   #chatBtn{display:none !important}
@@ -153,6 +161,7 @@ small i{font-style:normal;font-weight:bold}
 <div id='menuMain'><button id='b'>Jouer</button><button id='br'>Classé</button></div>
 <div id='menuSec'><button id='bs'>Boutique</button><button id='bm'>Multijoueur</button><button id='bsp' type='button'>🎡 Roue du jour</button><button id='helpToggle' type='button'>Aide</button></div>
 <div id='board'><h2>Records</h2><ol id='bl'><li class='e'>Chargement…</li></ol></div>
+<div id='qsBox'><h2>Quêtes du jour</h2><ol id='qs'></ol><div id='lv'></div></div>
 <div id='helpBox'>ZQSD / flèches pour bouger · Maj ou Espace pour sprinter · P pause.<br>Mobile : moitié gauche = bouger, moitié droite = sprint.<br><i style='color:#ff6b8a'>Rouge</i> rebondit · <i style='color:#ff9a3a'>Orange</i> te poursuit · <i style='color:#4dff8f'>Vert</i> +1 vie · <i style='color:#6be3ff'>Cyan</i> bouclier · <i style='color:#c58bff'>Violet</i> gel · <i style='color:#ff7ad9'>Rose</i> aimant.</div>
 </div>
 </div>
@@ -172,6 +181,8 @@ small i{font-style:normal;font-weight:bold}
 <div id='stabs'></div>
 <div id='shopSec'>Offre du moment</div>
 <div id='sg'></div>
+<h2>Améliorations progressives</h2>
+<div id='su'></div>
 <h2>Ma collection</h2>
 <div id='sc'></div>
 <div id='codeBox'>
@@ -220,6 +231,7 @@ small i{font-style:normal;font-weight:bold}
 <div id='chatLog'></div>
 <form id='chatForm' autocomplete='off'><input id='chatIn' maxlength='200' placeholder='Message…' autocomplete='off'><button type='submit'>Envoyer</button></form>
 </aside>
+<div id='pk' hidden><span id='pn'></span><button type='button' id='pb'>Équiper</button><button type='button' id='px'>Fermer</button></div>
 <button id='mb' title='Couper ou remettre le son' aria-label='Couper ou remettre le son'>🔊</button>
 <script src='https://cdn.jsdelivr.net/npm/three@0.150.1/build/three.min.js'></script>
 <script src='https://unpkg.com/mqtt@5.10.1/dist/mqtt.min.js'></script>
@@ -233,5 +245,6 @@ small i{font-style:normal;font-weight:bold}
 <script src='p6.js'></script>
 <script src='p7.js'></script>
 <script src='p8.js'></script>
+<script src='p9.js'></script>
 </body>
 </html>
