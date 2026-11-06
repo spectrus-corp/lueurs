@@ -137,6 +137,12 @@ async function claimGifts(){
 }
 
 async function adminSendGift(){
+  const key=(($('adKey')&&$('adKey').value)||'').trim();
+  if(key!=='lueurs-admin'){
+    try{$('adminMsg').textContent='Code admin requis / incorrect';$('adminMsg').style.color='var(--r)'}catch(e){}
+    try{beep(180,.12,'sawtooth')}catch(e){}
+    return;
+  }
   const code=(($('adCode').value||'').trim().toUpperCase().replace(/\s+/g,''));
   const orbs=Math.max(0,Math.floor(+$('adOrbs').value||0));
   const item=(($('adItem').value||'').trim().toLowerCase());
@@ -220,7 +226,7 @@ try{
       const p=prompt('Mot de passe admin');
       if(p==='lueurs-admin'){
         $('adminBox').hidden=false;
-        try{$('adminMsg').textContent='Mode admin activé';$('adminMsg').style.color='var(--g)'}catch(e){}
+        try{$('adminMsg').textContent='Mode admin activé — entre le code pour envoyer';$('adminMsg').style.color='var(--g)'}catch(e){}
       }else if(p!=null){
         try{$('adminMsg').textContent='Refusé'}catch(e){}
       }
