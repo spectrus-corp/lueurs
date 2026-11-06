@@ -133,6 +133,21 @@ small i{font-style:normal;font-weight:bold}
 #lv{font-size:13px;opacity:.85;color:var(--g);margin-top:4px}
 #pk{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(70px + env(safe-area-inset-bottom,0px));z-index:8;display:flex;gap:8px;align-items:center;padding:10px 14px;border-radius:16px;background:#120e24f0;border:1px solid #ffffff22}
 #pk[hidden]{display:none}
+#stats{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;background:#0e0a1ef5;padding:0;overflow:hidden;z-index:6}
+#stats[hidden]{display:none}
+#statsPanel{width:100%;max-width:560px;height:100%;overflow-y:auto;padding:18px 18px 36px;display:flex;flex-direction:column;gap:14px}
+#statsPanel h1{font-size:clamp(28px,5vw,40px);margin:0;color:var(--g);font-weight:400}
+#statsGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stCard{background:#1a1438cc;border:1px solid #ffffff18;border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:4px}
+.stCard b{font-size:22px;color:var(--g);font-weight:600}
+.stCard span{font-size:12px;opacity:.75}
+#giftBox,#adminBox{background:#1a1438cc;border:1px solid #ffffff18;border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:10px}
+#giftBox h2,#adminBox h2{margin:0;font-size:18px;color:var(--c);font-weight:500}
+#giftCode{font-size:22px;letter-spacing:.12em;color:var(--g);font-family:ui-monospace,monospace;text-align:center;padding:8px;background:#0c0a1c;border-radius:10px;user-select:all}
+#giftRow{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+#giftRow button,#adminBox button{font-size:14px;padding:8px 14px}
+#giftMsg,#adminMsg{font-size:13px;min-height:18px;text-align:center;opacity:.9}
+#adminBox input,#adminBox select{width:100%;padding:10px 12px;border-radius:10px;border:1px solid #ffffff22;background:#0c0a1c;color:var(--c);font-size:15px}
 @media(min-width:801px){
   #chat{top:0;right:0;bottom:0;width:min(300px,28vw);border-radius:0;border-right:none;border-top:none;border-bottom:none}
   #chatBtn{display:none !important}
@@ -159,7 +174,7 @@ small i{font-style:normal;font-weight:bold}
 <p id='p' class='tagline'>Attrape les lueurs, enchaîne les combos, survit aux cristaux.</p>
 <div id='go' hidden><input id='nm' maxlength='12' placeholder='Votre pseudo' autocomplete='off'><button id='sb'>Envoyer mon score</button></div>
 <div id='menuMain'><button id='b'>Jouer</button><button id='br'>Classé</button></div>
-<div id='menuSec'><button id='bs'>Boutique</button><button id='bm'>Multijoueur</button><button id='bsp' type='button'>🎡 Roue du jour</button><button id='helpToggle' type='button'>Aide</button></div>
+<div id='menuSec'><button id='bs'>Boutique</button><button id='bm'>Multijoueur</button><button id='bsp' type='button'>🎡 Roue du jour</button><button id='bst' type='button'>Stats</button><button id='helpToggle' type='button'>Aide</button></div>
 <div id='board'><h2>Records</h2><ol id='bl'><li class='e'>Chargement…</li></ol></div>
 <div id='qsBox'><h2>Quêtes du jour</h2><ol id='qs'></ol><div id='lv'></div></div>
 <div id='helpBox'>ZQSD / flèches pour bouger · Maj ou Espace pour sprinter · P pause.<br>Mobile : moitié gauche = bouger, moitié droite = sprint.<br><i style='color:#ff6b8a'>Rouge</i> rebondit · <i style='color:#ff9a3a'>Orange</i> te poursuit · <i style='color:#4dff8f'>Vert</i> +1 vie · <i style='color:#6be3ff'>Cyan</i> bouclier · <i style='color:#c58bff'>Violet</i> gel · <i style='color:#ff7ad9'>Rose</i> aimant.</div>
@@ -232,6 +247,44 @@ small i{font-style:normal;font-weight:bold}
 <form id='chatForm' autocomplete='off'><input id='chatIn' maxlength='200' placeholder='Message…' autocomplete='off'><button type='submit'>Envoyer</button></form>
 </aside>
 <div id='pk' hidden><span id='pn'></span><button type='button' id='pb'>Équiper</button><button type='button' id='px'>Fermer</button></div>
+
+<div id='stats' hidden>
+<div id='statsPanel'>
+<h1>Stats</h1>
+<div id='statsGrid'>
+<div class='stCard'><b id='stWallet'>0</b><span>Lueurs (portefeuille)</span></div>
+<div class='stCard'><b id='stBest'>0</b><span>Meilleur score</span></div>
+<div class='stCard'><b id='stRank'>—</b><span>Rang</span></div>
+<div class='stCard'><b id='stRankPts'>0</b><span>Points de rang</span></div>
+<div class='stCard'><b id='stOwned'>0</b><span>Objets possédés</span></div>
+<div class='stCard'><b id='stGames'>0</b><span>Parties jouées</span></div>
+<div class='stCard'><b id='stTotal'>0</b><span>Lueurs collectées (total)</span></div>
+<div class='stCard'><b id='stLvl'>1</b><span>Niveau / XP</span></div>
+</div>
+<div id='giftBox'>
+<h2>Code cadeau</h2>
+<p style='margin:0;font-size:13px;opacity:.8;text-align:center'>Donne ce code pour recevoir un cadeau (orbs, skins…)</p>
+<div id='giftCode'>GIFT-······</div>
+<div id='giftRow'>
+<button type='button' id='giftCopy'>Copier</button>
+<button type='button' id='giftCheck'>Vérifier mes cadeaux</button>
+</div>
+<div id='giftMsg'></div>
+</div>
+<div id='adminBox' hidden>
+<h2>Admin — envoyer un cadeau</h2>
+<input id='adCode' maxlength='16' placeholder='GIFT-XXXXXX' autocomplete='off' spellcheck='false' style='text-transform:uppercase;letter-spacing:.06em'>
+<input id='adOrbs' type='number' min='0' step='100' placeholder='Orbs (ex: 50000)'>
+<input id='adItem' maxlength='8' placeholder='Item id optionnel (ex: k5, t4, a1)' style='text-transform:lowercase'>
+<input id='adLabel' maxlength='40' placeholder='Message (optionnel)'>
+<button type='button' id='adSend'>Envoyer le cadeau</button>
+<div id='adminMsg'></div>
+</div>
+<button type='button' id='statsBack' style='align-self:center;margin-top:8px'>Retour</button>
+<p id='adminHint' style='font-size:11px;opacity:.45;text-align:center;cursor:pointer'>Espace admin</p>
+</div>
+</div>
+
 <button id='mb' title='Couper ou remettre le son' aria-label='Couper ou remettre le son'>🔊</button>
 <script src='https://cdn.jsdelivr.net/npm/three@0.150.1/build/three.min.js'></script>
 <script src='https://unpkg.com/mqtt@5.10.1/dist/mqtt.min.js'></script>
@@ -246,5 +299,6 @@ small i{font-style:normal;font-weight:bold}
 <script src='p7.js'></script>
 <script src='p8.js'></script>
 <script src='p9.js'></script>
+<script src='p10.js'></script>
 </body>
 </html>
