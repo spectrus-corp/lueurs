@@ -1,5 +1,5 @@
 function priceOf(it){return it.p!=null?it.p:PR[it.r]}
-let wallet=0,owned=[],eq={k:'k0',t:'t0',a:'a0'},bd=null,accM=null,curSkin=DEFK,curTrail=DEFT,tE=0,shownSlot=-1,shopTab='all',previewing=null;
+let wallet=0,owned=[],eq={k:'k0',t:'t0',a:'a0'},accM=null,curSkin=DEFK,curTrail=DEFT,tE=0,shownSlot=-1,shopTab='all',previewing=null;
 try{wallet=+localStorage.getItem('lueursW')||0;owned=JSON.parse(localStorage.getItem('lueursO')||'[]');eq=Object.assign(eq,JSON.parse(localStorage.getItem('lueursE')||'{}'));muted=localStorage.getItem('lueursM')=='1'}catch(e){}
 if(!eq.a)eq.a='a0';
 let syncCode='';try{syncCode=localStorage.getItem('lueursSync')||''}catch(e){}
