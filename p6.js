@@ -4,74 +4,18 @@ const typing=e=>{const t=e&&e.target;return !!(t&&(t.tagName==='INPUT'||t.tagNam
 const K={};addEventListener('keydown',e=>{if(typing(e))return;K[e.code]=1;if(KD[e.code]&&!e.repeat)dirIn(KD[e.code]);if(e.code=='Escape'&&!$('shop').hidden){closeShop();return}if(e.code=='Space'&&run){e.preventDefault()}if((e.code=='KeyP'||e.code=='Escape')&&run)pause(!paused)});addEventListener('keyup',e=>K[e.code]=0);addEventListener('blur',()=>pause(true));
 addEventListener('pagehide',save);document.addEventListener('visibilitychange',()=>{if(document.hidden)save()});
 let stamina=1,sprintHeld=false,sprinting=false,shk=0,fever=0,feverStreak=0;
-let _grantUntil=0,_vibQ=[],_iosH=null,_lastBuzz=0,_touchOn=false,_tx=0,_ty=0;
-function ensureIosH(){
-  if(_iosH)return _iosH;
-  try{
-    const lab=document.createElement('label');
-    const inp=document.createElement('input');
-    inp.type='checkbox';
-    try{inp.switch=true}catch(e){}
-    inp.setAttribute('switch','');
-    lab.appendChild(inp);
-    lab.setAttribute('aria-hidden','true');
-    lab.style.cssText='position:fixed;left:-80px;top:-80px;width:64px;height:64px;opacity:0.01;z-index:2147483647;margin:0;padding:0;-webkit-tap-highlight-color:transparent;';
-    inp.style.cssText='width:64px;height:64px;margin:0;opacity:0.01;';
-    document.body.appendChild(lab);
-    _iosH={lab,inp};
-  }catch(e){}
-  return _iosH;
-}
-function armHaptic(e){
-  if(e&&e.isTrusted===false)return;
-  _grantUntil=performance.now()+1200;
-  if(e&&(e.clientX||e.clientX===0)){_tx=e.clientX;_ty=e.clientY;_touchOn=true}
-  try{
-    const t=(e&&e.changedTouches&&e.changedTouches[0])||(e&&e.touches&&e.touches[0]);
-    if(t){_tx=t.clientX;_ty=t.clientY;_touchOn=true}
-  }catch(err){}
-  drainVib();
-}
-function iosTick(){
-  const h=ensureIosH();if(!h)return;
-  try{
-    if(_touchOn){h.lab.style.left=(_tx-32)+'px';h.lab.style.top=(_ty-32)+'px'}
-    h.inp.checked=!h.inp.checked;
-    h.lab.click();
-  }catch(e){}
-}
-function drainVib(){
-  if(performance.now()>=_grantUntil||!_vibQ.length)return;
-  _vibQ.shift();
-  iosTick();
-  if(_vibQ.length)setTimeout(drainVib,28);
-}
-function buzz(ms){
-  const now=performance.now();
-  if(now-_lastBuzz<20)return;
-  _lastBuzz=now;
-  try{if(typeof navigator!=='undefined'&&typeof navigator.vibrate==='function')navigator.vibrate(ms|0)}catch(e){}
-  _vibQ.push(ms|0);
-  if(_vibQ.length>8)_vibQ.length=8;
-  drainVib();
-}
+function buzz(ms){try{if(window.__haptic)window.__haptic(ms);else if(typeof navigator!=='undefined'&&typeof navigator.vibrate==='function')navigator.vibrate(ms|0)}catch(e){}}
 function shake(a){
   a=Math.min(a||0,.72);
   shk=Math.max(shk,a);
-  if(a>0.08)buzz(Math.min(90,Math.floor(16+a*85)));
+  if(a>0.08)buzz(Math.min(100,Math.floor(18+a*90)));
 }
 function isSprintKey(){return !!(K.ShiftLeft||K.ShiftRight||K.Space)}
-try{
-  const _arm=e=>armHaptic(e);
-  addEventListener('touchstart',_arm,{capture:true,passive:true});
-  addEventListener('touchend',_arm,{capture:true,passive:true});
-  addEventListener('pointerdown',_arm,{capture:true,passive:true});
-}catch(e){}
 let movePtr=null,sprintPtr=null,moveOrigin=null,Tv=[0,0];
 const lim=v=>Math.max(-1,Math.min(1,v));
 const touchUI=e=>!!(e.target.closest&&e.target.closest('button,input,textarea,select,#chat,#shop,#mp,#msg,#codeBox,#syncBox'));
 addEventListener('pointerdown',e=>{
-  armHaptic(e);_touchOn=true;_tx=e.clientX;_ty=e.clientY;
+  try{window.__hapticArm&&window.__hapticArm(e)}catch(e){}
   if(paused&&run)pause(false);
   if(!run||touchUI(e))return;
   const right=e.clientX>=innerWidth*0.5;
@@ -82,7 +26,6 @@ addEventListener('pointerdown',e=>{
   }
 });
 addEventListener('pointermove',e=>{
-  _tx=e.clientX;_ty=e.clientY;if(e.buttons||e.pressure>0)_touchOn=true;
   if(e.pointerId===movePtr&&moveOrigin){
     Tv=[lim((e.clientX-moveOrigin[0])/60),lim((e.clientY-moveOrigin[1])/60)];
   }
@@ -90,7 +33,6 @@ addEventListener('pointermove',e=>{
 function endTouch(e){
   if(e.pointerId===movePtr){movePtr=null;moveOrigin=null;Tv=[0,0]}
   if(e.pointerId===sprintPtr){sprintPtr=null;sprintHeld=false}
-  if(!movePtr&&!sprintPtr)_touchOn=false;else armHaptic(e);
 }
 addEventListener('pointerup',endTouch);
 addEventListener('pointercancel',endTouch);
@@ -155,7 +97,7 @@ if(shield>0&&shield<2&&Math.floor(shield*4)!=Math.floor((shield+dt)*4))beep(800,
 P.visible=inv<=0||Math.floor(t*10)%2==0;sh.visible=shield>0;hud()}}
 else if(!run){P.rotation.y+=dt*.5;P.visible=true;stamina=upStaminaMax();sprinting=false;sprintHeld=false;movePtr=sprintPtr=null;moveOrigin=null;Tv=[0,0];fever=0;feverStreak=0}
 $('fl').style.opacity=Math.max(flash,fever>0?.07+Math.sin(t*7)*.04:0);try{if(fever>0)$('fl').style.background='#ffd36b';else if(flash<=0)$('fl').style.background='#ff2a55'}catch(e){}
-$('bn').style.opacity=paused?1:Math.min(1,Math.max(bt,0));bt-=dt;
+$('bn').style.opacity=paused?1;Math.min(1,Math.max(bt,0));bt-=dt;
 for(let i=bits.length-1;i>=0;i--){const b=bits[i],u=b.userData;u.life-=dt;if(u.life<=0){S.remove(b);bits.splice(i,1);continue}u.vy-=15*dt;b.position.x+=u.vx*dt;b.position.y=Math.max(.1,b.position.y+u.vy*dt);b.position.z+=u.vz*dt;b.scale.setScalar(u.life/.6)}
 for(let i=trl.length-1;i>=0;i--){const b=trl[i],u=b.userData;u.life-=dt;if(u.life<=0){S.remove(b);trl.splice(i,1);continue}b.position.y=Math.max(.1,b.position.y+u.up*dt);const k=u.life/u.L;if(u.style==='streak'){b.scale.x=u.s0*.45*k;b.scale.y=u.s0*.45*k;b.scale.z=u.s0*(1.2+k)}else b.scale.setScalar(u.s0*k)}
 cam.lerp(new THREE.Vector3(P.position.x,16,P.position.z+13),1-Math.exp(-4*dt));C.position.copy(cam);if(shk>.015){const sx=(Math.random()-.5)*shk*.75,sy=(Math.random()-.5)*shk*.55;C.position.x+=sx;C.position.y+=sy;C.position.z+=(Math.random()-.5)*shk*.28;shk*=.8;try{const c=document.querySelector('canvas');if(c)c.style.transform='translate('+((Math.random()-.5)*shk*8)+'px,'+((Math.random()-.5)*shk*6)+'px)'}catch(e){}}else{shk=0;try{const c=document.querySelector('canvas');if(c)c.style.transform=''}catch(e){}}C.lookAt(P.position.x,0,P.position.z-2);
