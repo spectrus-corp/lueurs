@@ -52,7 +52,8 @@ if(msg0){try{const p=$('p');if(p)p.textContent=msg0+' '+(p.textContent||'')}catc
 let rings=[],mts=[],jp=null,jt=18,shk=0;
 function ring(p,c,sz=8,life=.6){
   try{
-    const m=new THREE.Mesh(RG,new THREE.MeshBasicMaterial({color:c,transparent:true,opacity:.8,side:THREE.DoubleSide,depthWrite:false}));
+    const geo=(typeof RG!=='undefined')?RG:new THREE.RingGeometry(.6,1,24);
+    const m=new THREE.Mesh(geo,new THREE.MeshBasicMaterial({color:c,transparent:true,opacity:.8,side:THREE.DoubleSide,depthWrite:false}));
     m.rotation.x=-Math.PI/2;m.position.set(p.x,.15,p.z);S.add(m);rings.push({m,life,L:life,sz});
   }catch(e){}
 }
@@ -73,7 +74,8 @@ function bomb(){
 function mkJp(){
   try{
     if(jp)return;
-    const m=new THREE.Mesh(new THREE.SphereGeometry(.55,12,10),om.j);
+    const mat=(om&&om.j)?om.j:new THREE.MeshStandardMaterial({color:0xffe48a,emissive:0xffb830});
+    const m=new THREE.Mesh(new THREE.SphereGeometry(.55,12,10),mat);
     const l=new THREE.PointLight(0xffe48a,2,12);m.add(l);m.scale.setScalar(2.2);
     m.position.set(rnd(),1.3,rnd());m.userData.life=9;S.add(m);jp=m;banner('Jackpot !');seq([784,988,1175,1568],.07,'triangle');
   }catch(e){}
@@ -189,3 +191,16 @@ setInterval(()=>{
     });
   }catch(e){}
 },800);
+
+/* self-tick so jackpot/meteors run even without p6 hooks */
+(function(){
+  let last=performance.now();
+  function loop(now){
+    requestAnimationFrame(loop);
+    const dt=Math.min((now-last)/1000,.05);last=now;
+    if(window.claudeFx&&window.claudeFx.tick){
+      try{window.claudeFx.tick(dt,now/1000)}catch(e){}
+    }
+  }
+  requestAnimationFrame(loop);
+})();
