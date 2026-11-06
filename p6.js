@@ -5,7 +5,14 @@ const K={};addEventListener('keydown',e=>{if(typing(e))return;K[e.code]=1;if(KD[
 addEventListener('pagehide',save);document.addEventListener('visibilitychange',()=>{if(document.hidden)save()});
 let stamina=1,sprintHeld=false,sprinting=false,shk=0,fever=0,feverStreak=0;
 function shake(a){
-  shk=Math.max(shk,Math.min(a||0,.55));
+  a=Math.min(a||0,.72);
+  shk=Math.max(shk,a);
+  try{
+    if(typeof navigator!=='undefined'&&navigator.vibrate&&a>0.08){
+      const ms=Math.min(90,Math.floor(16+a*85));
+      navigator.vibrate(ms);
+    }
+  }catch(e){}
 }
 function isSprintKey(){return !!(K.ShiftLeft||K.ShiftRight||K.Space)}
 let movePtr=null,sprintPtr=null,moveOrigin=null,Tv=[0,0];
@@ -55,10 +62,10 @@ if(t-lastT>upComboWin()){if(combo>=3)seq([440,370,300],.07,'triangle');combo=1}
 for(const o of orbs){const dx=P.position.x-o.position.x,dz=P.position.z-o.position.z,d=Math.hypot(dx,dz);
 if(magnet>0&&d<upMagnetR()&&d>.08){const pull=(typeof upMagnetSp==='function'?upMagnetSp():34)*(0.5+0.65*(1-Math.min(1,d/upMagnetR())));o.position.x+=dx/d*pull*dt;o.position.z+=dz/d*pull*dt}
 if(d<1.6){const q=o.userData.k,ox=o.position.x,oz=o.position.z;burst(o.position,q);
-if(q=='g'){combo=t-lastT<upComboWin()?Math.min(combo+1,5):1;lastT=t;gain(combo+(hasU('u7')&&got%8==7?1:0)+(hasU('u11')&&got%10==9?2:0)+(fever>0?combo:0));got++;feverStreak++;beep(480+combo*90,.08);noise(.05,3500,.04);shake(.14+combo*.04+(combo>=5?.08:0));if(combo==5)beep(1500,.1,'sine',.06);if(fever<=0){const need=hasU('u12')?9:12;if(feverStreak>=need){fever=hasU('u13')?11:8;feverStreak=0;banner('FIÈVRE !');seq([660,880,1100,1320],.07,'triangle');noise(.2,1200,.06);shake(.35)}}if(got%(ranked?4:5)==0&&haz.length<(ranked?16:14))mkHaz('d')}
-else if(q=='s'){shield=6*upShieldMul();gain(2);banner('Bouclier !');seq([300,450,600],.08,'triangle');shake(.4)}
-else if(q=='f'){freeze=5*upFreezeMul();gain(2);banner('Gel !');seq([900,700,500,350],.07,'sine');noise(.3,6000,.05);shake(.4)}
-else if(q=='m'){gain(2);if(magnet<=0){magnet=7;banner('Aimant !');seq([380,480,380,480],.07,'triangle');shake(.4)}else{beep(520,.05,'triangle')}}
+if(q=='g'){combo=t-lastT<upComboWin()?Math.min(combo+1,5):1;lastT=t;gain(combo+(hasU('u7')&&got%8==7?1:0)+(hasU('u11')&&got%10==9?2:0)+(fever>0?combo:0));got++;feverStreak++;beep(480+combo*90,.08);noise(.05,3500,.04);shake(.2+combo*.05+(combo>=5?.1:0));if(combo==5)beep(1500,.1,'sine',.06);if(fever<=0){const need=hasU('u12')?9:12;if(feverStreak>=need){fever=hasU('u13')?11:8;feverStreak=0;banner('FIÈVRE !');seq([660,880,1100,1320],.07,'triangle');noise(.2,1200,.06);shake(.42)}}if(got%(ranked?4:5)==0&&haz.length<(ranked?16:14))mkHaz('d')}
+else if(q=='s'){shield=6*upShieldMul();gain(2);banner('Bouclier !');seq([300,450,600],.08,'triangle');shake(.48)}
+else if(q=='f'){freeze=5*upFreezeMul();gain(2);banner('Gel !');seq([900,700,500,350],.07,'sine');noise(.3,6000,.05);shake(.48)}
+else if(q=='m'){gain(2);if(magnet<=0){magnet=7;banner('Aimant !');seq([380,480,380,480],.07,'triangle');shake(.48)}else{beep(520,.05,'triangle')}}
 else if(q=='b'){try{if(window.claudeFx&&window.claudeFx.onBomb)window.claudeFx.onBomb(o.position);else{gain(1);burst(o.position,'r',12);beep(120,.2,'sawtooth')}}catch(e){gain(1)}}
 else{gain(1)}
 const nk=rk();kind(o,nk);o.position.set(rnd(),1,rnd());
@@ -83,7 +90,7 @@ if(run){
 if(lives==1){heart-=dt;if(heart<=0){heart=1;beep(90,.12,'sine');beep(70,.14,'sine',.18)}}
 if(grn){const v=grn.userData.v;grn.userData.life-=dt;grn.position.x+=v.x*dt;grn.position.z+=v.z*dt;if(Math.abs(grn.position.x)>A-1)v.x*=-1;if(Math.abs(grn.position.z)>A-1)v.z*=-1;
 grn.rotation.y+=dt*3;grn.position.y=1+Math.sin(t*4)*.3;grn.visible=grn.userData.life>3||Math.floor(t*8)%2==0;
-if(Math.hypot(grn.position.x-P.position.x,grn.position.z-P.position.z)<1.9){lives=Math.min(lives+1,5);gain(10);burst(grn.position,'n',28);banner('+1 vie   +10');seq([523,659,784,1047,1319],.08,'triangle');noise(.2,5000,.05,.1);shake(.55);killGreen()}
+if(Math.hypot(grn.position.x-P.position.x,grn.position.z-P.position.z)<1.9){lives=Math.min(lives+1,5);gain(10);burst(grn.position,'n',28);banner('+1 vie   +10');seq([523,659,784,1047,1319],.08,'triangle');noise(.2,5000,.05,.1);shake(.62);killGreen()}
 else if(grn.userData.life<=0){seq([500,400,300],.1,'sine');killGreen()}}
 else{greenT-=dt;if(greenT<=0)mkGreen()}
 const sp0=shield>0,fp0=freeze>0,mp0=magnet>0;
@@ -96,7 +103,7 @@ $('fl').style.opacity=Math.max(flash,fever>0?.07+Math.sin(t*7)*.04:0);try{if(fev
 $('bn').style.opacity=paused?1:Math.min(1,Math.max(bt,0));bt-=dt;
 for(let i=bits.length-1;i>=0;i--){const b=bits[i],u=b.userData;u.life-=dt;if(u.life<=0){S.remove(b);bits.splice(i,1);continue}u.vy-=15*dt;b.position.x+=u.vx*dt;b.position.y=Math.max(.1,b.position.y+u.vy*dt);b.position.z+=u.vz*dt;b.scale.setScalar(u.life/.6)}
 for(let i=trl.length-1;i>=0;i--){const b=trl[i],u=b.userData;u.life-=dt;if(u.life<=0){S.remove(b);trl.splice(i,1);continue}b.position.y=Math.max(.1,b.position.y+u.up*dt);const k=u.life/u.L;if(u.style==='streak'){b.scale.x=u.s0*.45*k;b.scale.y=u.s0*.45*k;b.scale.z=u.s0*(1.2+k)}else b.scale.setScalar(u.s0*k)}
-cam.lerp(new THREE.Vector3(P.position.x,16,P.position.z+13),1-Math.exp(-4*dt));C.position.copy(cam);if(shk>.015){const sx=(Math.random()-.5)*shk*.55,sy=(Math.random()-.5)*shk*.4;C.position.x+=sx;C.position.y+=sy;C.position.z+=(Math.random()-.5)*shk*.2;shk*=.78;try{const c=document.querySelector('canvas');if(c)c.style.transform='translate('+((Math.random()-.5)*shk*5)+'px,'+((Math.random()-.5)*shk*4)+'px)'}catch(e){}}else{shk=0;try{const c=document.querySelector('canvas');if(c)c.style.transform=''}catch(e){}}C.lookAt(P.position.x,0,P.position.z-2);
+cam.lerp(new THREE.Vector3(P.position.x,16,P.position.z+13),1-Math.exp(-4*dt));C.position.copy(cam);if(shk>.015){const sx=(Math.random()-.5)*shk*.75,sy=(Math.random()-.5)*shk*.55;C.position.x+=sx;C.position.y+=sy;C.position.z+=(Math.random()-.5)*shk*.28;shk*=.8;try{const c=document.querySelector('canvas');if(c)c.style.transform='translate('+((Math.random()-.5)*shk*8)+'px,'+((Math.random()-.5)*shk*6)+'px)'}catch(e){}}else{shk=0;try{const c=document.querySelector('canvas');if(c)c.style.transform=''}catch(e){}}C.lookAt(P.position.x,0,P.position.z-2);
 if(window.updateFluidTrail)try{window.updateFluidTrail(dt)}catch(e){}
 if(window.mpTick)try{window.mpTick(dt)}catch(e){}
 R.render(S,C)}
