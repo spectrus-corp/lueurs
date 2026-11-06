@@ -1,0 +1,19 @@
+{
+  "name": "Lueurs",
+  "short_name": "Lueurs",
+  "description": "Jeu 3D de collecte de lueurs",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#14102a",
+  "theme_color": "#14102a",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%2314102a'/%3E%3Ccircle cx='90' cy='90' r='48' fill='%23ffd36b'/%3E%3Ccircle cx='90' cy='90' r='28' fill='%236be3ff'/%3E%3C/svg%3E",
+      "sizes": "180x180",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
