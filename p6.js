@@ -4,21 +4,49 @@ const typing=e=>{const t=e&&e.target;return !!(t&&(t.tagName==='INPUT'||t.tagNam
 const K={};addEventListener('keydown',e=>{if(typing(e))return;K[e.code]=1;if(KD[e.code]&&!e.repeat)dirIn(KD[e.code]);if(e.code=='Escape'&&!$('shop').hidden){closeShop();return}if(e.code=='Space'&&run){e.preventDefault()}if((e.code=='KeyP'||e.code=='Escape')&&run)pause(!paused)});addEventListener('keyup',e=>K[e.code]=0);addEventListener('blur',()=>pause(true));
 addEventListener('pagehide',save);document.addEventListener('visibilitychange',()=>{if(document.hidden)save()});
 let stamina=1,sprintHeld=false,sprinting=false,shk=0,fever=0,feverStreak=0;
+let _touchOn=false,_tx=0,_ty=0,_iosAuth=0,_iosH=null,_lastBuzz=0;
+function armHaptic(){_iosAuth=performance.now()+1500}
+function iosPulse(){
+  try{
+    if(!_iosH){
+      const lab=document.createElement('label');
+      const inp=document.createElement('input');
+      inp.type='checkbox';
+      try{inp.switch=true}catch(e){}
+      inp.setAttribute('switch','');
+      lab.appendChild(inp);
+      lab.setAttribute('aria-hidden','true');
+      lab.style.cssText='position:fixed;left:0;top:0;width:56px;height:56px;opacity:0.02;z-index:2147483646;margin:0;padding:0;-webkit-tap-highlight-color:transparent;touch-action:none;';
+      inp.style.cssText='width:56px;height:56px;margin:0;opacity:0.02;';
+      document.body.appendChild(lab);
+      _iosH={lab,inp};
+    }
+    if(_touchOn){_iosH.lab.style.left=(_tx-28)+'px';_iosH.lab.style.top=(_ty-28)+'px'}
+    _iosH.inp.checked=!_iosH.inp.checked;
+    try{_iosH.lab.click()}catch(e){}
+  }catch(e){}
+}
+function buzz(ms){
+  const now=performance.now();
+  if(now-_lastBuzz<28)return;
+  _lastBuzz=now;
+  try{navigator.vibrate?.(ms)}catch(e){}
+  if(_touchOn||now<_iosAuth)iosPulse();
+}
 function shake(a){
   a=Math.min(a||0,.72);
   shk=Math.max(shk,a);
-  try{
-    if(typeof navigator!=='undefined'&&navigator.vibrate&&a>0.08){
-      const ms=Math.min(90,Math.floor(16+a*85));
-      navigator.vibrate(ms);
-    }
-  }catch(e){}
+  if(a>0.08){
+    const ms=Math.min(90,Math.floor(16+a*85));
+    buzz(ms);
+  }
 }
 function isSprintKey(){return !!(K.ShiftLeft||K.ShiftRight||K.Space)}
 let movePtr=null,sprintPtr=null,moveOrigin=null,Tv=[0,0];
 const lim=v=>Math.max(-1,Math.min(1,v));
 const touchUI=e=>!!(e.target.closest&&e.target.closest('button,input,textarea,select,#chat,#shop,#mp,#msg,#codeBox,#syncBox'));
 addEventListener('pointerdown',e=>{
+  armHaptic();_touchOn=true;_tx=e.clientX;_ty=e.clientY;
   if(paused&&run)pause(false);
   if(!run||touchUI(e))return;
   const right=e.clientX>=innerWidth*0.5;
@@ -29,6 +57,7 @@ addEventListener('pointerdown',e=>{
   }
 });
 addEventListener('pointermove',e=>{
+  _tx=e.clientX;_ty=e.clientY;if(e.buttons||e.pressure>0)_touchOn=true;
   if(e.pointerId===movePtr&&moveOrigin){
     Tv=[lim((e.clientX-moveOrigin[0])/60),lim((e.clientY-moveOrigin[1])/60)];
   }
@@ -36,6 +65,7 @@ addEventListener('pointermove',e=>{
 function endTouch(e){
   if(e.pointerId===movePtr){movePtr=null;moveOrigin=null;Tv=[0,0]}
   if(e.pointerId===sprintPtr){sprintPtr=null;sprintHeld=false}
+  if(!movePtr&&!sprintPtr)_touchOn=false;else armHaptic();
 }
 addEventListener('pointerup',endTouch);
 addEventListener('pointercancel',endTouch);
@@ -77,7 +107,7 @@ if(u.t=='c'){const dx=P.position.x-h.position.x,dz=P.position.z-h.position.z,d=M
 else{h.position.x+=v.x*dt*spd;h.position.z+=v.z*dt*spd;if(Math.abs(h.position.x)>A-1)v.x*=-1;if(Math.abs(h.position.z)>A-1)v.z*=-1;h.rotation.y+=dt*2;h.rotation.x+=dt}
 if(Math.hypot(h.position.x-P.position.x,h.position.z-P.position.z)<1.6){
 if(shield>0){burst(h.position,'r',16);gain(u.t=='c'?5:3);noise(.2,900,.12);beep(600,.1,'square');away(h)}
-else if(inv<=0){inv=1.5;flash=.45;feverStreak=0;if(fever>0){fever=0;banner('Fièvre brisée');}burst(P.position,'r',16);noise(.25,400,.15);beep(140,.25,'sawtooth');
+else if(inv<=0){inv=1.5;flash=.45;feverStreak=0;if(fever>0){fever=0;banner('Fièvre brisée');}burst(P.position,'r',16);noise(.25,400,.15);beep(140,.25,'sawtooth');try{buzz(55);shake(.35)}catch(e){}
 if(window.mpPlaying&&typeof window.mpOnHit==='function'){
   if(window.mpOnHit()){break}
 }else{
