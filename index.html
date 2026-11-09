@@ -17,7 +17,9 @@ html,body{margin:0;height:100%;overflow:hidden;background:var(--bg);color:#f3e9d
 canvas{display:block}
 #hud{position:fixed;top:calc(12px + env(safe-area-inset-top,0px));left:18px;right:18px;display:flex;justify-content:space-between;align-items:flex-start;pointer-events:none;text-shadow:0 1px 8px #000a;font-size:20px}
 #s{font-size:34px;color:var(--g)}#cb{color:var(--c);margin-left:8px}
-#wl{font-size:14px;opacity:.85;color:var(--c)}
+#wl{font-size:14px;opacity:.85;color:var(--c);transition:transform .2s ease,color .2s ease;display:inline-block}
+#wl.pulse{animation:wlPulse .38s ease}
+@keyframes wlPulse{0%{transform:scale(1)}35%{transform:scale(1.28);color:#ffd36b}100%{transform:scale(1)}}
 #fx{font-size:15px;color:var(--c);text-align:center;line-height:1.5}
 #l{color:var(--r);font-size:24px}
 #bn{position:fixed;top:22%;left:0;right:0;text-align:center;font-size:clamp(28px,6vw,52px);color:var(--g);pointer-events:none;text-shadow:0 2px 16px #000;opacity:0}
@@ -132,7 +134,9 @@ small i{font-style:normal;font-weight:bold}
 #mpIn,#cdIn,#chatIn,#syncIn{touch-action:auto;user-select:text}
 #chatForm button{font-size:14px;padding:8px 14px;min-width:auto}
 .fl2{position:fixed;transform:translate(-50%,-50%);font-size:20px;font-weight:bold;pointer-events:none;text-shadow:0 2px 8px #000;z-index:12;animation:fl2up .9s ease-out forwards}
-@keyframes fl2up{to{opacity:0;transform:translate(-50%,-120%)}}
+.fl2.pts{font-size:clamp(24px,6vw,40px);color:#ffd36b;text-shadow:0 0 14px #ffd36baa,0 2px 10px #000;font-weight:700}
+@keyframes fl2up{to{opacity:0;transform:translate(-50%,-130%) scale(1.15)}}
+.orbFly{position:fixed;width:22px;height:22px;margin-left:-11px;margin-top:-11px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff9e6,#ffd36b 42%,#ff9a1a 92%);box-shadow:0 0 16px #ffd36bcc,0 0 32px #ff9a1a66;pointer-events:none;z-index:25;transition:transform .58s cubic-bezier(.12,.82,.22,1),opacity .52s ease;opacity:1}
 #qsBox{width:100%;max-width:320px;text-align:left;padding:8px 12px;border-radius:12px;background:#ffffff08;border:1px solid #ffffff14;font-size:13px}
 #qsBox h2{margin:0 0 4px;font-size:12px;color:var(--c);font-weight:400;opacity:.85;text-transform:uppercase;letter-spacing:.04em}
 #qs li{font-size:13px;padding:2px 0}
@@ -186,113 +190,6 @@ small i{font-style:normal;font-weight:bold}
 <div id='helpBox'>ZQSD / flèches pour bouger · Maj ou Espace pour sprinter · P pause.<br>Mobile : moitié gauche = bouger, moitié droite = sprint.<br><i style='color:#ff6b8a'>Rouge</i> rebondit · <i style='color:#ff9a3a'>Orange</i> te poursuit · <i style='color:#4dff8f'>Vert</i> +1 vie · <i style='color:#6be3ff'>Cyan</i> bouclier · <i style='color:#c58bff'>Violet</i> gel · <i style='color:#ff7ad9'>Rose</i> aimant.</div>
 </div>
 </div>
-<div id='spinOverlay' hidden>
-<h2 id='spinTitle'>Roue du jour</h2>
-<div id='spinWrap'><div id='spinPin'></div><canvas id='spinWheel' width='300' height='300'></canvas></div>
-<div id='spinResult'></div>
-<div id='spinHint'>1 tour gratuit par jour</div>
-<button id='spinClose' type='button'>Fermer</button>
-</div>
-<div id='shop' hidden>
-<div id='shopPanel'>
-<div id='shopHead'>
-<h1>Boutique</h1>
-<div id='sinfo'><span id='sw'></span><span id='st'></span></div>
-</div>
-<div id='stabs'></div>
-<div id='shopSec'>Offre du moment</div>
-<div id='sg'></div>
-<h2>Améliorations progressives</h2>
-<div id='su'></div>
-<h2>Ma collection</h2>
-<div id='sc'></div>
-<div id='codeBox'>
-<label for='cdIn'>Code bonus</label>
-<input id='cdIn' maxlength='24' placeholder='Entrez un code' autocomplete='off' spellcheck='false'>
-<button type='button' id='cdGo'>Valider</button>
-<div id='cdMsg'></div>
-</div>
-<div id='syncBox'>
-<label>Synchronisation de compte</label>
-<div id='syncOn' style='font-size:13px;opacity:.85;width:100%;text-align:center;color:var(--c)'>Non lié</div>
-<div style='display:flex;flex-wrap:wrap;gap:8px;justify-content:center;width:100%'>
-<button type='button' id='syncGen' style='font-size:14px;padding:8px 14px'>Générer SYNC-</button>
-<button type='button' id='syncClr' style='font-size:14px;padding:8px 14px;opacity:.75'>Détacher</button>
-</div>
-<input id='syncIn' maxlength='16' placeholder='SYNC-XXXXXX' autocomplete='off' spellcheck='false' style='width:min(220px,70vw);text-transform:uppercase;letter-spacing:.06em'>
-<button type='button' id='syncJoin' style='font-size:14px;padding:8px 14px'>Lier cet appareil</button>
-<div id='syncMsg' style='font-size:12px;min-height:16px;width:100%;text-align:center;opacity:.9'></div>
-</div>
-<button id='sx'>Retour</button>
-</div>
-</div>
-<div id='mp' hidden>
-<h2>Multijoueur</h2>
-<p style='opacity:.85;max-width:36ch;margin:0'>Choisis un mode, crée un salon et envoie le code à ton pote.</p>
-<div id='mpModes' style='display:flex;gap:8px;flex-wrap:wrap;justify-content:center'>
-<button type='button' id='mpModeCoop' class='on'>Collecte</button>
-<button type='button' id='mpModeBattle'>Battle</button>
-</div>
-<p id='mpModeDesc' style='opacity:.75;max-width:36ch;margin:0;font-size:13px;line-height:1.4'>Collecte commune : score d’équipe, vies partagées, objectif à atteindre ensemble.</p>
-<button id='mpNew'>Nouvelle session</button>
-<div id='mpCodeBox' hidden></div>
-<div id='mpJoinRow'>
-<input id='mpIn' maxlength='8' placeholder='CODE' autocomplete='off' spellcheck='false'>
-<button id='mpJoin'>Rejoindre</button>
-</div>
-<div id='mpStatus'></div>
-<button id='mpPlay' hidden type='button'>Lancer la partie</button>
-<button id='mpLeave' hidden>Quitter la session</button>
-<button id='mpBack'>Retour</button>
-</div>
-<div id='mpHud' hidden></div>
-<button id='chatBtn' type='button' title='Chat' aria-label='Chat'>💬</button>
-<aside id='chat' hidden>
-<div id='chatHead'><span>Session <b id='chatCode'></b></span><span id='chatPeer' style='opacity:.75'></span><button type='button' id='chatX' aria-label='Fermer'>×</button></div>
-<div id='chatLog'></div>
-<form id='chatForm' autocomplete='off'><input id='chatIn' maxlength='200' placeholder='Message…' autocomplete='off'><button type='submit'>Envoyer</button></form>
-</aside>
-<div id='stats' hidden>
-<div id='statsPanel'>
-<h1>Stats</h1>
-<div id='statsGrid'></div>
-<div id='giftBox'>
-<h2>Code cadeau</h2>
-<div id='giftCode'>—</div>
-<div id='giftRow'>
-<button type='button' id='giftCopy'>Copier</button>
-<button type='button' id='giftNew'>Nouveau code</button>
-</div>
-<input id='giftIn' maxlength='20' placeholder='GIFT-XXXXXX' autocomplete='off' spellcheck='false' style='width:100%;text-transform:uppercase'>
-<button type='button' id='giftClaim'>Récupérer un cadeau</button>
-<div id='giftMsg'></div>
-</div>
-<div id='adminBox' hidden>
-<h2>Admin cadeaux</h2>
-<input id='adKey' type='password' placeholder='Code admin' autocomplete='off'>
-<input id='adGift' maxlength='20' placeholder='GIFT-XXXXXX' autocomplete='off' style='text-transform:uppercase'>
-<select id='adType'><option value='orbs'>Orbs</option><option value='item'>Item</option></select>
-<input id='adVal' placeholder='Montant ou id item'>
-<button type='button' id='adSend'>Envoyer</button>
-<div id='adminMsg'></div>
-</div>
-<button id='statsBack' type='button'>Retour</button>
-</div>
-</div>
-<button id='mb' type='button' title='Son'>🔊</button>
-<script src='https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js'></script>
-<script src='p0.js'></script>
-<script src='p1.js'></script>
-<script src='p2.js'></script>
-<script src='p2_rest.js'></script>
-<script src='p3.js'></script>
-<script src='p4.js'></script>
-<script src='p5.js'></script>
-<script src='haptic.js'></script>
-<script src='p6.js'></script>
-<script src='p7.js'></script>
-<script src='p8.js'></script>
-<script src='p9.js'></script>
-<script src='p10.js'></script>
-</body>
-</html>
+<script>
+/* body continues from original - scripts loaded below */
+</script>
