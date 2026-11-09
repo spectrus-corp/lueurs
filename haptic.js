@@ -16,7 +16,6 @@
       inp.setAttribute('switch','');
       lab.appendChild(inp);
       lab.setAttribute('aria-hidden','true');
-      /* ALWAYS none — must never steal menu clicks */
       lab.style.cssText='position:fixed;left:-9999px;top:-9999px;width:1px;height:1px;margin:0;padding:0;opacity:0;pointer-events:none!important;z-index:-1;';
       inp.style.cssText='width:1px;height:1px;margin:0;opacity:0;pointer-events:none!important;';
       (document.body||document.documentElement).appendChild(lab);
@@ -65,7 +64,6 @@
     }catch(e){}
   }
 
-  /* ONLY called from game events (shake/buzz), never from touchmove */
   function haptic(ms){
     ms=ms|0;
     if(ms<8)ms=12;
@@ -84,7 +82,6 @@
     audioThump(ms);
   }
 
-  /* Track gesture grant only — never touch pointer-events or overlay position */
   var opts={capture:true,passive:true};
   function onGesture(){arm()}
   addEventListener('touchstart',onGesture,opts);
@@ -109,4 +106,18 @@
   if(document.readyState==='loading'){
     document.addEventListener('DOMContentLoaded',mk);
   }else{mk();}
+
+  /* boot VFX pack + float text style */
+  try{
+    var st=document.createElement('style');
+    st.textContent='.fl2{font-size:22px!important;font-weight:800!important;letter-spacing:.04em;text-shadow:0 0 12px currentColor,0 2px 10px #000!important}';
+    (document.head||document.documentElement).appendChild(st);
+  }catch(e){}
+  try{
+    if(!document.querySelector('script[src="vfx.js"]')){
+      var s=document.createElement('script');
+      s.src='vfx.js';
+      (document.body||document.documentElement).appendChild(s);
+    }
+  }catch(e){}
 })();
