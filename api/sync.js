@@ -29,12 +29,13 @@ function sanitize(b) {
   const wallet = Math.max(0, Math.floor(Number(b.wallet) || 0));
   if (wallet > 50000000) throw new Error('invalid wallet');
   const owned = Array.isArray(b.owned)
-    ? b.owned.filter((id) => typeof id === 'string' && /^[ktau]\d+$/.test(id)).slice(0, 120)
+    ? b.owned.filter((id) => typeof id === 'string' && /^[ktauv]\d{1,3}$/.test(id)).slice(0, 120)
     : [];
   const eq = {
     k: typeof b.eq?.k === 'string' && /^k\d+$/.test(b.eq.k) ? b.eq.k : 'k0',
     t: typeof b.eq?.t === 'string' && /^t\d+$/.test(b.eq.t) ? b.eq.t : 't0',
-    a: typeof b.eq?.a === 'string' && /^a\d+$/.test(b.eq.a) ? b.eq.a : 'a0'
+    a: typeof b.eq?.a === 'string' && /^a\d+$/.test(b.eq.a) ? b.eq.a : 'a0',
+    v: typeof b.eq?.v === 'string' && /^v\d+$/.test(b.eq.v) ? b.eq.v : 'v0'
   };
   const rankPts = Math.max(0, Math.floor(Number(b.rankPts) || 0));
   const best = Math.max(0, Math.floor(Number(b.best) || 0));
