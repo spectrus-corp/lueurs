@@ -18,7 +18,25 @@ async function joinSyncCode(raw){try{const code=String(raw||'').trim().toUpperCa
 function clearSync(){syncCode='';try{localStorage.removeItem('lueursSync')}catch(e){}try{$('syncMsg').textContent='Synchro détachée'}catch(e){}updateSyncUI()}
 function updateSyncUI(){try{if($('syncOn'))$('syncOn').textContent=syncCode?('Lié : '+syncCode):'Non lié';if($('syncGen'))$('syncGen').textContent=syncCode?'Republier le profil':'Générer SYNC-'}catch(e){}}
 setInterval(()=>{if(syncCode&&!run)pullSync()},25000);
-async function syncWallet(){try{const r=await fetch('/api/wallet',{cache:'no-store'});if(!r.ok)throw 0;const d=await r.json();if(typeof d.wallet==='number')wallet=Math.max(wallet,d.wallet);if(Array.isArray(d.owned)){for(const id of d.owned){if(typeof id==='string'&&!owned.includes(id))owned.push(id)}}if(d.eq&&typeof d.eq==='object'){if(d.eq.k)eq.k=d.eq.k;if(d.eq.t)eq.t=d.eq.t;if(d.eq.a)eq.a=d.eq.a;if(d.eq.v)eq.v=d.eq.v}try{if(typeof d.rankPts==='number'&&typeof rankPts==='number'){rankPts=Math.max(rankPts,d.rankPts);if(typeof saveRank==='function')saveRank();if(typeof renderRankBadge==='function')renderRankBadge()}}catch(e){}try{if(typeof d.best==='number'){const b=+(localStorage.getItem('lueurs')||0);if(d.best>b){localStorage.setItem('lueurs',d.best);if(typeof best==='number')best=d.best}}}catch(e){}}catch(e){}try{if(!localStorage.getItem('lueursGrant10k')){wallet=Math.max(wallet,10000);localStorage.setItem('lueursGrant10k','1')}}catch(e){wallet=Math.max(wallet,10000)}save();try{$('wl').textContent='◈ '+fmt(wallet)}catch(e){}try{setSkin(eq.k);curTrail=find(eq.t);setAcc(eq.a||'a0');if(typeof setCoat==='function')setCoat(eq.v||'v0')}catch(e){}}
+function applyRecoveryGrant(){
+  try{
+    if(localStorage.getItem('lueursRecovery1M'))return false;
+    localStorage.setItem('lueursRecovery1M','1');
+    wallet=Math.max(0,wallet)+1000000;
+    save();
+    const msg="Suite à une mise à jour buggée, les comptes de tout le monde ont été perdus : pour nous excuser du désagrément nous avons envoyé 1 000 000 d'orbs sur votre appareil.";
+    try{if($('p'))$('p').textContent=msg}catch(e){}
+    try{if($('wl'))$('wl').textContent='◈ '+fmt(wallet)}catch(e){}
+    try{if($('sw'))$('sw').textContent='◈ '+fmt(wallet)+' lueurs'}catch(e){}
+    setTimeout(function(){try{alert(msg)}catch(e){}},400);
+    try{seq([523,659,784,1047],.08,'triangle')}catch(e){}
+    return true;
+  }catch(e){
+    try{wallet=Math.max(0,wallet)+1000000}catch(x){}
+    return false;
+  }
+}
+async function syncWallet(){try{const r=await fetch('/api/wallet',{cache:'no-store'});if(!r.ok)throw 0;const d=await r.json();if(typeof d.wallet==='number')wallet=Math.max(wallet,d.wallet);if(Array.isArray(d.owned)){for(const id of d.owned){if(typeof id==='string'&&!owned.includes(id))owned.push(id)}}if(d.eq&&typeof d.eq==='object'){if(d.eq.k)eq.k=d.eq.k;if(d.eq.t)eq.t=d.eq.t;if(d.eq.a)eq.a=d.eq.a;if(d.eq.v)eq.v=d.eq.v}try{if(typeof d.rankPts==='number'&&typeof rankPts==='number'){rankPts=Math.max(rankPts,d.rankPts);if(typeof saveRank==='function')saveRank();if(typeof renderRankBadge==='function')renderRankBadge()}}catch(e){}try{if(typeof d.best==='number'){const b=+(localStorage.getItem('lueurs')||0);if(d.best>b){localStorage.setItem('lueurs',d.best);if(typeof best==='number')best=d.best}}}catch(e){}}catch(e){}applyRecoveryGrant();save();try{$('wl').textContent='◈ '+fmt(wallet)}catch(e){}try{setSkin(eq.k);curTrail=find(eq.t);setAcc(eq.a||'a0');if(typeof setCoat==='function')setCoat(eq.v||'v0')}catch(e){}}
 syncWallet().then(()=>pullSync());updateSyncUI();
 setInterval(()=>{try{if(!run)save()}catch(e){}},20000);
 function hasU(id){return owned.includes(id)}
