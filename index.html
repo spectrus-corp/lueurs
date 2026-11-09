@@ -1,1 +1,83 @@
-PLACEHOLDER
+<!doctype html>
+<html lang='fr'>
+<head>
+<meta charset='utf-8'>
+<meta name='viewport' content='width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1,user-scalable=no'>
+<meta name='theme-color' content='#14102a'>
+<meta name='apple-mobile-web-app-capable' content='yes'>
+<meta name='apple-mobile-web-app-status-bar-style' content='black-translucent'>
+<meta name='apple-mobile-web-app-title' content='Lueurs'>
+<meta name='mobile-web-app-capable' content='yes'>
+<link rel='manifest' href='/manifest.json'>
+<title>Lueurs : jeu 3D</title>
+<style>
+:root{--g:#ffd36b;--r:#ff6b8a;--c:#6be3ff;--bg:#14102a}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden;background:var(--bg);color:#f3e9d2;font-family:Georgia,'Times New Roman',serif;touch-action:none;user-select:none}
+canvas{display:block}
+#hud{position:fixed;top:calc(12px + env(safe-area-inset-top,0px));left:18px;right:18px;display:flex;justify-content:space-between;align-items:flex-start;pointer-events:none;text-shadow:0 1px 8px #000a;font-size:20px}
+#s{font-size:34px;color:var(--g)}#cb{color:var(--c);margin-left:8px}
+#wl{font-size:14px;opacity:.85;color:var(--c);transition:transform .2s ease,color .2s ease;display:inline-block}
+#wl.pulse{animation:wlPulse .38s ease}
+@keyframes wlPulse{0%{transform:scale(1)}35%{transform:scale(1.28);color:#ffd36b}100%{transform:scale(1)}}
+#fx{font-size:15px;color:var(--c);text-align:center;line-height:1.5}
+#l{color:var(--r);font-size:24px}
+#bn{position:fixed;top:22%;left:0;right:0;text-align:center;font-size:clamp(28px,6vw,52px);color:var(--g);pointer-events:none;text-shadow:0 2px 16px #000;opacity:0}
+#dash{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(12px + env(safe-area-inset-bottom,0px));width:min(140px,36vw);height:5px;border-radius:3px;background:#ffffff14;opacity:.55;pointer-events:none;z-index:5}
+#db{display:block;height:100%;width:100%;background:linear-gradient(90deg,#6be3ff,#7dffb0);border-radius:3px;transform-origin:left center;transition:transform .08s linear}
+#dbtn{display:none!important}
+#fl{position:fixed;inset:0;background:#ff2a55;opacity:0;pointer-events:none}
+#msg{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:linear-gradient(180deg,#0c0a1cf2 0%,#14102af5 50%,#1a1430f0 100%);text-align:center;padding:16px 16px 28px;overflow:auto}
+#msgHome{display:flex;flex-direction:column;align-items:center;gap:12px;width:min(420px,100%)}
+#msg .tagline{margin:0;opacity:.8;font-size:14px;max-width:36ch;line-height:1.4}
+#menuMain{display:flex;flex-direction:column;gap:10px;width:100%;max-width:320px}
+#menuMain button{width:100%;padding:14px 20px;font-size:18px}
+#menuSec{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;max-width:320px}
+#menuSec button{padding:11px 12px;font-size:15px;opacity:.95}
+#menuSec #bsp{border-color:#c58bff;color:#c58bff}
+#menuSec #bsp:hover{background:#c58bff;color:var(--bg)}
+#menuSec #bsp:disabled{opacity:.4;border-color:#ffffff44;color:#ffffff88}
+.fl2{position:fixed;transform:translate(-50%,-50%);font-size:20px;font-weight:bold;pointer-events:none;text-shadow:0 2px 8px #000;z-index:12;animation:fl2up .9s ease-out forwards}
+.fl2.pts{font-size:clamp(24px,6vw,40px);color:#ffd36b;text-shadow:0 0 14px #ffd36baa,0 2px 10px #000;font-weight:700}
+@keyframes fl2up{to{opacity:0;transform:translate(-50%,-130%) scale(1.15)}}
+.orbFly{position:fixed;width:22px;height:22px;margin-left:-11px;margin-top:-11px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff9e6,#ffd36b 42%,#ff9a1a 92%);box-shadow:0 0 16px #ffd36bcc,0 0 32px #ff9a1a66;pointer-events:none;z-index:25;transition:transform .58s cubic-bezier(.12,.82,.22,1),opacity .52s ease;opacity:1}
+button{font:inherit;font-size:20px;padding:12px 30px;border:2px solid var(--g);background:transparent;color:var(--g);border-radius:999px;cursor:pointer}
+button:hover,button:focus-visible{background:var(--g);color:var(--bg);outline:none}
+#msg[hidden]{display:none}
+#msg h1{font-size:clamp(36px,8vw,64px);margin:0;font-weight:400;color:var(--g)}
+</style>
+</head>
+<body>
+<div id='hud'><div><span id='s'>0</span><span id='cb'></span><div id='wl'></div></div><div id='fx'></div><div id='l'></div></div>
+<div id='bn'></div>
+<div id='dash'><i id='db'></i></div>
+<div id='fl'></div>
+<div id='msg'>
+<div id='msgHome'>
+<h1 id='t'>Lueurs</h1>
+<p id='p' class='tagline'>Attrape les lueurs, enchaîne les combos, survit aux cristaux.</p>
+<div id='menuMain'><button id='b'>Jouer</button><button id='br'>Classé</button></div>
+<div id='menuSec'><button id='bs'>Boutique</button><button id='bm'>Multijoueur</button></div>
+</div>
+</div>
+<div id='shop' hidden></div>
+<div id='mp' hidden></div>
+<div id='stats' hidden></div>
+<div id='spinOverlay' hidden></div>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js'></script>
+<script src='https://unpkg.com/mqtt@5/dist/mqtt.min.js'></script>
+<script src='haptic.js'></script>
+<script src='vfx.js'></script>
+<script src='p0.js'></script>
+<script src='p1.js'></script>
+<script src='p2.js'></script>
+<script src='p3.js'></script>
+<script src='p4.js'></script>
+<script src='p5.js'></script>
+<script src='p6.js'></script>
+<script src='p7.js'></script>
+<script src='p8.js'></script>
+<script src='p9.js'></script>
+<script src='p10.js'></script>
+</body>
+</html>
