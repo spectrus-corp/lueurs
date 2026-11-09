@@ -63,8 +63,8 @@ function rankDiff(){
 }
 renderRankBadge();
 
-function hud(){$('s').textContent=score;$('cb').textContent=combo>1?'×'+combo:'';$('wl').textContent='◈ '+fmt(wallet);$('l').textContent='♥'.repeat(Math.max(lives,0));$('fx').innerHTML=(ranked?'Classé · ':'')+'Vague '+wave+(typeof fever==='number'&&fever>0?'<br><span style="color:#ffd36b">Fièvre '+Math.ceil(fever)+' s</span>':'')+(shield>0?'<br>Bouclier '+Math.ceil(shield)+' s':'')+(freeze>0?'<br>Gel '+Math.ceil(freeze)+' s':'')+(magnet>0?'<br>Aimant '+Math.ceil(magnet)+' s':'');$('db').style.transform='scaleX('+Math.max(0,Math.min(1,stamina/upStaminaMax()))+')'}
-async function board(){const ul=$('bl');try{const r=await fetch('/api/score',{cache:'no-store'});if(!r.ok)throw 0;const d=await r.json();worldBest=d.length?d[0].score:0;ul.innerHTML=d.length?d.slice(0,5).map((e,i)=>'<li><span>'+(i+1)+'. '+esc(e.name)+'</span><b>'+e.score+'</b></li>').join(''):`<li class='e'>Aucun record pour l’instant. Soyez le premier.</li>`}catch(e){ul.innerHTML=`<li class='e'>Classement indisponible pour le moment.</li>`}}
+function hud(){try{$('s').textContent=score;$('cb').textContent=combo>1?'×'+combo:'';$('wl').textContent='◈ '+fmt(wallet);$('l').textContent='♥'.repeat(Math.max(lives,0));$('fx').innerHTML=(ranked?'Classé · ':'')+'Vague '+wave+(typeof fever==='number'&&fever>0?'<br><span style="color:#ffd36b">Fièvre '+Math.ceil(fever)+' s</span>':'')+(shield>0?'<br>Bouclier '+Math.ceil(shield)+' s':'')+(freeze>0?'<br>Gel '+Math.ceil(freeze)+' s':'')+(magnet>0?'<br>Aimant '+Math.ceil(magnet)+' s':'');$('db').style.transform='scaleX('+Math.max(0,Math.min(1,stamina/upStaminaMax()))+')'}catch(e){}}
+async function board(){const ul=$('bl');if(!ul)return;try{const r=await fetch('/api/score',{cache:'no-store'});if(!r.ok)throw 0;const d=await r.json();worldBest=d.length?d[0].score:0;ul.innerHTML=d.length?d.slice(0,5).map((e,i)=>'<li><span>'+(i+1)+'. '+esc(e.name)+'</span><b>'+e.score+'</b></li>').join(''):"<li class='e'>Aucun record pour l'instant.</li>"}catch(e){ul.innerHTML="<li class='e'>Classement indisponible.</li>"}}
 function start(isRanked){
 ranked=!!isRanked;
 const D=rankDiff();
@@ -90,12 +90,13 @@ if(ranked){
 }
 $('t').textContent=ranked?'Fin classée':'Fin de partie';
 $('p').textContent=(nb?'Nouveau record ! ':'')+score+' pts · Vague '+wave+' · Combo max en jeu'+rankMsg;
-$('go').hidden=false;$('msg').hidden=false;$('nm').value=localStorage.getItem('lueursN')||'';$('nm').focus();board();seq([400,350,300,250],.12,'sawtooth');noise(.3,200,.2)}
-$('b').onclick=()=>start(false);
-$('br').onclick=()=>start(true);
-$('sb').onclick=async()=>{const name=$('nm').value.trim()||'Anonyme';localStorage.setItem('lueursN',name);$('sb').disabled=true;try{const r=await fetch('/api/score',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,score})});if(!r.ok)throw 0;$('go').hidden=true;$('p').textContent='Score envoyé au classement mondial.';seq([523,659,784,1047],.1,'triangle');board()}catch(e){$('sb').disabled=false;$('p').textContent='Envoi impossible, réessayez.';beep(150,.25,'sawtooth')}};
+try{if($('go'))$('go').hidden=false;if($('nm')){$('nm').value=localStorage.getItem('lueursN')||'';$('nm').focus()}}catch(e){}
+$('msg').hidden=false;board();seq([400,350,300,250],.12,'sawtooth');noise(.3,200,.2)}
+window.start=start;
+try{var _b=$('b');if(_b)_b.onclick=function(){start(false)}}catch(e){}
+try{var _br=$('br');if(_br)_br.onclick=function(){start(true)}}catch(e){}
+try{var _sb=$('sb');if(_sb)_sb.onclick=async function(){var name=($('nm')&&$('nm').value.trim())||'Anonyme';localStorage.setItem('lueursN',name);_sb.disabled=true;try{var r=await fetch('/api/score',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,score})});if(!r.ok)throw 0;if($('go'))$('go').hidden=true;$('p').textContent='Score envoyé au classement mondial.';seq([523,659,784,1047],.1,'triangle');board()}catch(e){_sb.disabled=false;$('p').textContent='Envoi impossible, réessayez.';beep(150,.25,'sawtooth')}}}catch(e){}
 
-/* ---- Roue du jour ---- */
 const SPIN_REWARDS=[
   {t:'orbs',n:80,label:'80 orbs',c:'#6be3ff'},
   {t:'orbs',n:150,label:'150 orbs',c:'#7dffb0'},
@@ -125,26 +126,26 @@ function drawWheel(rot){
 }
 let spinning=false;
 function openSpin(){
-  $('spinOverlay').hidden=false;$('spinResult').textContent='';$('spinHint').textContent=canSpin()?'1 tour gratuit par jour':'Déjà utiliséé aujourd\'hui — reviens demain';
-  drawWheel(0);$('spinWheel').style.transform='rotate(0deg)';
-  if(canSpin())setTimeout(()=>doSpin(),400);
+  if(!$('spinOverlay'))return;
+  $('spinOverlay').hidden=false;if($('spinResult'))$('spinResult').textContent='';if($('spinHint'))$('spinHint').textContent=canSpin()?'1 tour gratuit par jour':'Déjà utiliséé aujourd\'hui';
+  drawWheel(0);if($('spinWheel'))$('spinWheel').style.transform='rotate(0deg)';
+  if(canSpin())setTimeout(function(){doSpin()},400);
 }
 function doSpin(){
   if(spinning||!canSpin())return;spinning=true;
   const n=SPIN_REWARDS.length,idx=Math.floor(Math.random()*n),seg=360/n;
   const target=360*6+(360-idx*seg-seg/2);const el=$('spinWheel');
+  if(!el){spinning=false;return}
   el.style.transition='transform 4.2s cubic-bezier(.12,.75,.08,1)';el.style.transform='rotate('+target+'deg)';
-  setTimeout(()=>{
+  setTimeout(function(){
     const r=SPIN_REWARDS[idx];let msg='';
     if(r.t==='orbs'){wallet+=r.n;save();msg='+'+r.n+' orbs'}
     else if(r.t==='rank'){rankPts+=r.n;saveRank();renderRankBadge();msg='+'+r.n+' pts de rang'}
-    markSpun();$('spinResult').textContent=msg;$('spinHint').textContent='Reviens demain';
+    markSpun();if($('spinResult'))$('spinResult').textContent=msg;if($('spinHint'))$('spinHint').textContent='Reviens demain';
     try{$('wl').textContent='◈ '+fmt(wallet)}catch(e){}
     seq([523,659,784,1047],.08,'triangle');noise(.1,4000,.05);spinning=false;
   },4300);
 }
-try{
-  $('bsp').onclick=()=>openSpin();
-  $('spinClose').onclick=()=>{$('spinOverlay').hidden=true};
-  $('helpToggle').onclick=()=>{$('helpBox').classList.toggle('open')};
-}catch(e){}
+try{var _bsp=$('bsp');if(_bsp)_bsp.onclick=function(){openSpin()}}catch(e){}
+try{var _sc=$('spinClose');if(_sc)_sc.onclick=function(){$('spinOverlay').hidden=true}}catch(e){}
+try{var _ht=$('helpToggle');if(_ht)_ht.onclick=function(){$('helpBox').classList.toggle('open')}}catch(e){}
