@@ -1,4 +1,4 @@
-/* Lueurs VFX pack — bursts, enemy death, lights, sparks */
+/* Lueurs VFX pack — bursts, enemy death, lights, sparks, orb to wallet */
 (function(){
   const VFX_COL={g:0xffd36b,s:0x6be3ff,f:0xc58bff,m:0xff7ad9,r:0xff4d6d,n:0x4dff8f,b:0xffa040,j:0xffe48a};
 
@@ -118,6 +118,70 @@
         const a=i/12*Math.PI*2;
         addBit(pos,hex,Math.cos(a)*5,3+Math.random()*4,Math.sin(a)*5,.5,'spark');
       }
+    }catch(e){}
+  };
+
+  window.orbToWallet=function(worldPos,amount){
+    try{
+      amount=Math.max(1,Math.floor(amount||1));
+      try{
+        const el=document.createElement('div');
+        el.className='fl2 pts';
+        el.textContent='+'+amount;
+        let sx=50,sy=42;
+        try{
+          if(worldPos&&typeof C!=='undefined'&&C){
+            const v=new THREE.Vector3(worldPos.x,(worldPos.y||1)+.5,worldPos.z);
+            v.project(C);
+            sx=(v.x*.5+.5)*100;
+            sy=(-v.y*.5+.5)*100;
+            sx=Math.max(8,Math.min(92,sx));
+            sy=Math.max(12,Math.min(78,sy));
+          }
+        }catch(e){}
+        el.style.left=sx+'%';
+        el.style.top=sy+'%';
+        el.style.color=amount>=5?'#fff':'#ffd36b';
+        if(amount>=3)el.style.fontSize=(22+Math.min(amount,8)*2)+'px';
+        document.body.appendChild(el);
+        setTimeout(function(){try{el.remove()}catch(e){}},950);
+      }catch(e){}
+
+      let x=innerWidth*.5,y=innerHeight*.45;
+      try{
+        if(worldPos&&typeof C!=='undefined'&&C){
+          const v=new THREE.Vector3(worldPos.x,(worldPos.y||1)+.3,worldPos.z);
+          v.project(C);
+          x=(v.x*.5+.5)*innerWidth;
+          y=(-v.y*.5+.5)*innerHeight;
+        }
+      }catch(e){}
+      const fly=document.createElement('div');
+      fly.className='orbFly';
+      fly.style.left=x+'px';
+      fly.style.top=y+'px';
+      document.body.appendChild(fly);
+      const wl=document.getElementById('wl')||document.getElementById('s');
+      let tx=24,ty=28;
+      if(wl){
+        const r=wl.getBoundingClientRect();
+        tx=r.left+r.width*.5;
+        ty=r.top+r.height*.5;
+      }
+      void fly.offsetWidth;
+      fly.style.transform='translate('+(tx-x)+'px,'+(ty-y)+'px) scale(.25)';
+      fly.style.opacity='0.15';
+      setTimeout(function(){
+        try{fly.remove()}catch(e){}
+        try{
+          if(wl){
+            wl.classList.remove('pulse');
+            void wl.offsetWidth;
+            wl.classList.add('pulse');
+            setTimeout(function(){try{wl.classList.remove('pulse')}catch(e){}},400);
+          }
+        }catch(e){}
+      },620);
     }catch(e){}
   };
 
