@@ -5,7 +5,7 @@ const K={};addEventListener('keydown',e=>{if(typing(e))return;K[e.code]=1;if(KD[
 addEventListener('pagehide',save);document.addEventListener('visibilitychange',()=>{if(document.hidden)save()});
 let stamina=1,sprintHeld=false,sprinting=false,shk=0,fever=0,feverStreak=0;
 function buzz(ms){try{if(window.__haptic)window.__haptic(ms);else if(typeof navigator!=='undefined'&&typeof navigator.vibrate==='function')navigator.vibrate(ms|0)}catch(e){}}
-function shake(a){a=Math.min(a||0,.55);shk=Math.max(shk,a);if(a>0.1)buzz(Math.min(80,Math.floor(14+a*70)))}
+function shake(a){a=Math.min(a||0,.55);shk=Math.max(shk,a);if(a>0.1)buzz(Math.min(80,Math.floor(14+a*70)));}
 function isSprintKey(){return !!(K.ShiftLeft||K.ShiftRight||K.Space)}
 let movePtr=null,sprintPtr=null,moveOrigin=null,Tv=[0,0];
 const lim=v=>Math.max(-1,Math.min(1,v));
