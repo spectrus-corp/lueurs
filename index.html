@@ -15,6 +15,7 @@
 *{box-sizing:border-box}
 html,body{margin:0;height:100%;overflow:hidden;background:var(--bg);color:#f3e9d2;font-family:Georgia,'Times New Roman',serif;touch-action:manipulation;user-select:none}
 canvas{display:block;pointer-events:none}
+body.run canvas{pointer-events:auto}
 #hud{position:fixed;top:calc(12px + env(safe-area-inset-top,0px));left:18px;right:18px;display:flex;justify-content:space-between;align-items:flex-start;pointer-events:none;text-shadow:0 1px 8px #000a;font-size:20px;z-index:4}
 #s{font-size:34px;color:var(--g)}#cb{color:var(--c);margin-left:8px}
 #wl{font-size:14px;opacity:.85;color:var(--c);transition:transform .2s ease,color .2s ease;display:inline-block}
@@ -83,6 +84,7 @@ input{font:inherit;padding:10px 14px;border-radius:999px;border:2px solid #fffff
 <script src='vfx.js'></script>
 <script src='p0.js'></script>
 <script src='p1.js'></script>
+<script src='skin.js'></script>
 <script src='p2.js'></script>
 <script src='p3.js'></script>
 <script src='p4.js'></script>
