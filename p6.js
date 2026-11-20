@@ -9,8 +9,8 @@ function shake(a){a=Math.min(a||0,.55);shk=Math.max(shk,a);if(a>0.1)buzz(Math.mi
 function isSprintKey(){return !!(K.ShiftLeft||K.ShiftRight||K.Space)}
 let movePtr=null,sprintPtr=null,moveOrigin=null,Tv=[0,0];
 const lim=v=>Math.max(-1,Math.min(1,v));
-const touchUI=e=>!!(e.target.closest&&e.target.closest('button,input,textarea,select,#chat,#shop,#mp,#msg,#codeBox,#syncBox'));
-addEventListener('pointerdown',e=>{try{window.__hapticArm&&window.__hapticArm(e)}catch(e){}if(paused&&run)pause(false);if(!run||touchUI(e))return;const right=e.clientX>=innerWidth*0.5;if(right){if(sprintPtr==null){sprintPtr=e.pointerId;sprintHeld=true}}else if(movePtr==null){movePtr=e.pointerId;moveOrigin=[e.clientX,e.clientY];Tv=[0,0]}});
+const touchUI=e=>!!(e.target.closest&&e.target.closest('button,input,textarea,select,#chat,#shop,#mp,#msg,#codeBox,#syncBox,#fpBtn'));
+addEventListener('pointerdown',e=>{try{window.__hapticArm&&window.__hapticArm(e)}catch(e){}if(paused&&run)pause(false);if(!run||touchUI(e))return;const right=e.clientX>=innerWidth*0.5;if(right){if(window.fpMode){/* look handled in mechanics */if(sprintPtr==null&&!window._lookPtr){sprintPtr=e.pointerId;sprintHeld=true}}else if(sprintPtr==null){sprintPtr=e.pointerId;sprintHeld=true}}else if(movePtr==null){movePtr=e.pointerId;moveOrigin=[e.clientX,e.clientY];Tv=[0,0]}});
 addEventListener('pointermove',e=>{if(e.pointerId===movePtr&&moveOrigin){Tv=[lim((e.clientX-moveOrigin[0])/60),lim((e.clientY-moveOrigin[1])/60)]}});
 function endTouch(e){if(e.pointerId===movePtr){movePtr=null;moveOrigin=null;Tv=[0,0]}if(e.pointerId===sprintPtr){sprintPtr=null;sprintHeld=false}}
 addEventListener('pointerup',endTouch);addEventListener('pointercancel',endTouch);
@@ -22,16 +22,18 @@ if(accM){accM.children.forEach(ch=>{if(ch.userData.spin){ch.position.x=Math.cos(
 if(curSkin&&curSkin.rb&&bd){const h=(t*.4)%1;bd.material.color.setHSL(h,.8,.65);bd.material.emissive.setHSL(h,.9,.4)}
 if(run&&!paused){
 let x=(K.ArrowRight||K.KeyD?1:0)-(K.ArrowLeft||K.KeyA?1:0)+Tv[0],z=(K.ArrowDown||K.KeyS?1:0)-(K.ArrowUp||K.KeyW?1:0)+Tv[1];
+const l0=Math.hypot(x,z);if(l0>1){x/=l0;z/=l0}
+if(typeof fpRemapInput==='function'&&window.fpMode){const m=fpRemapInput(x,z);x=m.x;z=m.z}
 const l=Math.hypot(x,z);if(l>1){x/=l;z/=l}
 const moving=Math.hypot(x,z)>0.05;
-const wantSprint=(sprintHeld||isSprintKey())&&moving&&stamina>0.02;
+const wantSprint=(sprintHeld||isSprintKey())&&moving&&stamina>0.02&&!(window.fpMode&&window._lookPtr!=null);
 sprinting=!!wantSprint;
 const sp=sprinting?upSprintMul():1;
 const k=Math.min(1,5*dt);vel.x+=(x*14*upSpeed()*sp-vel.x)*k;vel.z+=(z*14*upSpeed()*sp-vel.z)*k;
 if(sprinting){stamina=Math.max(0,stamina-upSprintDrain()*dt);if(stamina<=0){sprinting=false}}
 else{const rate=moving?0.18:0.32;stamina=Math.min(upStaminaMax(),stamina+rate*dt)}
 P.position.x=cl(P.position.x+vel.x*dt);P.position.z=cl(P.position.z+vel.z*dt);
-if(vel.length()>.8)P.rotation.y=Math.atan2(vel.x,vel.z);
+if(window.fpMode){P.rotation.y=window.fpYaw||0}else if(vel.length()>.8)P.rotation.y=Math.atan2(vel.x,vel.z);
 if(curTrail&&curTrail.c&&curTrail.c.length&&vel.length()>1.5&&trl.length<(typeof TRAIL_MAX==='number'?TRAIL_MAX:36)){tE-=dt;while(tE<=0){tE+=.07;try{if(typeof mkTrail==='function')mkTrail(curTrail)}catch(e){}}}
 if(t-lastT>upComboWin()){if(combo>=3)seq([440,370,300],.07,'triangle');combo=1}
 for(const o of orbs){const dx=P.position.x-o.position.x,dz=P.position.z-o.position.z,d=Math.hypot(dx,dz);
