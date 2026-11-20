@@ -14,6 +14,8 @@ const CAT=[
 {id:'k8',t:'k',n:'Dragon',r:3,g:'knot',c:0x4dff8f,e:0x0a8a3a},
 {id:'k9',t:'k',n:'Nova',r:3,g:'dod',c:0xffffff,e:0xffb830,i:2},
 {id:'k10',t:'k',n:'Spectre',r:4,g:'knot',c:0xffffff,e:0xffffff,rb:1},
+{id:'k11',t:'k',n:'Fantôme',r:4,g:'ico',c:0xffffff,e:0xffffff,i:1.2,rb:1,secret:1},
+{id:'k35',t:'k',n:'Mystère',r:4,g:'knot',c:0xffd36b,e:0x9a4dff,secret:1},
 {id:'t1',t:'t',n:'Étincelles',r:0,c:[0xffd36b,0xffb830],style:'dots'},
 {id:'t2',t:'t',n:'Brume',r:0,c:[0xb9d4ff,0xe6eeff],s:1.6,l:.8,style:'dots'},
 {id:'t4',t:'t',n:'Flamme',r:1,c:[0xff4a1a,0xff9a3a,0xffd36b],up:3,style:'streak'},
@@ -28,6 +30,12 @@ const CAT=[
 {id:'u2',t:'u',n:'Stamina +',r:1,p:900},
 {id:'u3',t:'u',n:'Vitesse +',r:2,p:1500},
 {id:'u7',t:'u',n:'Récolte',r:1,p:1000},
-{id:'u8',t:'u',n:'Endurance',r:2,p:1800}
+{id:'u8',t:'u',n:'Endurance',r:2,p:1800},
+{id:'u20',t:'u',n:'Double orbes',r:3,p:4500,desc:'×2 lueurs gagnées'},
+{id:'u21',t:'u',n:'Fantôme',r:3,p:5200,desc:'1 fois/partie : hit → invuln'},
+{id:'u22',t:'u',n:'Ralenti',r:2,p:2800,desc:'En sprint, ennemis ralentis'},
+{id:'u23',t:'u',n:'Cascade',r:2,p:2400,desc:'Chance de +1 bonus'},
+{id:'u24',t:'u',n:'Second souffle',r:4,p:9000,desc:'Revive 1 vie une fois'},
+{id:'u25',t:'u',n:'Radar',r:2,p:2200,desc:'Aimant passif permanent'}
 ];
 const find=id=>CAT.find(i=>i.id==id)||(id=='t0'?DEFT:id=='a0'?DEFA:DEFK);
